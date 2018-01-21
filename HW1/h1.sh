@@ -1,7 +1,7 @@
 # Done
-# Steps 1 .. 4
+# Steps 1 .. 5
 # TODO
-# Steps 5 .. 6
+# Steps 6
 
 if [[ $# -ne 3 ]]; then
 	echo "Usage: $0 submissions.tar.gz solution.c keyword"
@@ -17,6 +17,7 @@ refed_dir="Referenced"
 orig_dir="Original"
 tmp_dir="_tmp_"
 report_file="report.txt"
+result_file="results-$(date +%Y%m%d).tar.gz"
 
 copies_cnt=0
 refed_cnt=0
@@ -51,3 +52,8 @@ echo "Exact copies  $copies_cnt"		>  $report_file
 echo "Referenced    $refed_cnt"			>> $report_file
 echo "Original      $orig_cnt"			>> $report_file
 echo "Ratio         ${orig_ratio}%"	>> $report_file
+
+tar -czf "$result_file" "$copies_dir" "$refed_dir" "$orig_dir" "$solution" "$report_file"
+
+rm -rf "$copies_dir" "$refed_dir" "$orig_dir" "$tmp_dir"
+rm -f "$submissions" "$solution" "$report_file"
