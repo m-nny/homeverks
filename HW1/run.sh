@@ -1,11 +1,14 @@
-WORKING_DIR="__test__"
-TARBALL="_run_.tar.gz"
-SCRIPT="h1.sh"
-SCRIPT_ARGS="sub.tar.gz sol.c stackoverflow.com"
+work_dir="__test__"
+tar_file="_run_.tar.gz"
+script_file="h1.sh"
+script_args="sub.tar.gz sol.c stackoverflow.com"
+report_file="report.txt"
 
-rm -rf $WORKING_DIR
-mkdir -p $WORKING_DIR
-tar -xzf $TARBALL -C $WORKING_DIR
-cp $SCRIPT ${WORKING_DIR}/${SCRIPT}
-cd $WORKING_DIR
-./$SCRIPT $SCRIPT_ARGS
+rm -rf $work_dir
+mkdir -p $work_dir
+tar -xzf $tar_file -C $work_dir
+cp $script_file ${work_dir}/${script_file}
+cd $work_dir
+./$script_file $script_args
+
+cat "$report_file"
