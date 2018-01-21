@@ -1,7 +1,7 @@
 WORKING_DIR="__test__"
 TARBALL="_run_.tar.gz"
 SCRIPT="h1.sh"
-SCRIPT_ARGS="tt.tar.gz sol.c stack"
+SCRIPT_ARGS="sub.tar.gz sol.c stackoverflow.com"
 
 rm -rf $WORKING_DIR
 mkdir -p $WORKING_DIR
