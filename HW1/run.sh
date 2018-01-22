@@ -1,8 +1,9 @@
-work_dir="__test__"
-tar_file="_run_.tar.gz"
-script_file="h1.sh"
+work_dir="__test__"				# directory in which testing process will be done
+tar_file="_run_.tar.gz"		# tar file containing data needed for testing
+script_file="h1.sh"				# script, which needs to be tested
 script_args="sub.tar.gz sol.c stackoverflow.com"
-report_file="report.txt"
+													# script running arguments
+report_file="report.txt"	# report of the tested script
 
 rm -rf $work_dir
 mkdir -p $work_dir

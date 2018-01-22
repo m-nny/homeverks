@@ -1,10 +1,24 @@
+#  _    _
+# | |_ | |_  ___  ___  ___    _ _ _  ___  ___    _____       ___  ___  _ _
+# |  _||   || -_||  _|| -_|  | | | || .'||_ -|  |     |     |   ||   || | |
+# |_|  |_|_||___||_|  |___|  |_____||__,||___|  |_|_|_|_____|_|_||_|_||_  |
+#                                                     |_____|         |___|
+#
+# Solution for CSCI 232 Homework 1
+# Usage: h1.sh submissions.tar.gz solution keyword
+# More in README.md
+#
+# Created by m_nny, Alibek Manabayev
+# Alibek.manabayev@gmail.com
+# Copyright 2018. All rights reserved.
+
 # Done
-# Steps 1 .. 5
+# Steps 1 .. 6
 # TODO
-# Steps 6
+# some format
 
 if [[ $# -ne 3 ]]; then
-	echo "Usage: $0 submissions.tar.gz solution.c keyword"
+	echo "Usage: $0 submissions.tar.gz solution keyword"
 	exit 1
 fi
 
