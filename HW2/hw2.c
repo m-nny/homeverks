@@ -17,6 +17,8 @@
 #define IDAT 1229209940
 #define IEND 1229278788
 
+#define FIX_CURE 232
+
 void * read_to_buffer(int fd, int len) {
 	BUFTYPE * buff = calloc(BUFLEN, sizeof(BUFTYPE));
 	int n = read(fd, buff, len);
@@ -50,8 +52,14 @@ long buff_to_int(BUFTYPE * buff) {
 	return htonl(*np);
 }
 
+void fix_buf(BUFTYPE * buff, int len) {
+	for (int i = 0; i < len; i++)
+		buff[i] ^= FIX_CURE;
+}
+
 bool deal_with_chunk(int fd) {
 	BUFTYPE * buf = read_to_buffer(fd, 8);
+	int offset = 0;
 	print_buff(buf, 8);
 	print_str(buf + 4, 4);
 	int len = buff_to_int(buf);
@@ -60,12 +68,20 @@ bool deal_with_chunk(int fd) {
 	if (cd == IEND)
 		return 0;
 	if (cd != IDAT) {
-		int offset = lseek(fd, len + 4, SEEK_CUR);
+		offset = lseek(fd, len + 4, SEEK_CUR);
 		_asssert(offset);
 		return 1;
 	}
-	int offset = lseek(fd, len + 4, SEEK_CUR);
+	free(buf);
+	buf = read_to_buffer(fd, len);
+	fix_buf(buf, len);
+	offset = lseek(fd, -len, SEEK_CUR);
 	_asssert(offset);
+	offset = write(fd, buf, len);
+	_asssert(offset);
+	offset = lseek(fd, 4, SEEK_CUR);
+	_asssert(offset);
+	free(buf);
 	return 1;
 }
 
