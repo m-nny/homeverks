@@ -2,6 +2,9 @@
 **	This program is a very simple shell that only handles
 **	single word commands (no arguments).
 **	Type "quit" to quit.
+
+**  Alibek.manabayev@gmail.com
+**  Copyright 2018. All rights reserved.
 */
 #include <errno.h>
 #include <fcntl.h>
@@ -25,6 +28,9 @@ void d_log(char *str);
 void d_log2(char *str);
 void child_proc_background(char *arguments[ARGCNT]);
 void child_proc(char *arguments[ARGCNT]);
+bool checkRedOut_a(char **args, int n);
+bool checkRedOut(char **args, int n);
+bool checkRedIn(char **args, int n);
 
 int b_fd = -1;
 int in_fd = 0;
@@ -52,7 +58,7 @@ int main(int argc, char **argv) {
   for (;;) {
     d_log("Please enter a command:   ");
     fgets(buff, CMDLEN, stdin);
-    d_log(buff);
+    d_log2(buff);
     buff[strlen(buff) - 1] = '\0';
 
     // printf("|%s|%d\n", buff, strcmp(buff, "quit"));
@@ -62,20 +68,34 @@ int main(int argc, char **argv) {
 
     int n = parseArguments(buff, arguments);
 
-    // for (int i = 0; arguments[i] != NULL; i++) {
-    //   printf("\\%s/\n", arguments[i]);
-    // }
-
     background = n > 0 && !strcmp(arguments[n - 1], "&");
 
     if (background) {
       arguments[n - 1] = NULL;
+      n--;
     }
+
+    in_fd = dup(0);
+    out_fd = dup(1);
+    err_fd = dup(2);
+
+    for (int x = 0; x < 3; x++) {
+      if (checkRedIn(arguments, n))
+        n -= 2;
+      if (checkRedOut(arguments, n))
+        n -= 2;
+      if (checkRedOut_a(arguments, n))
+        n -= 2;
+    }
+    // printf("|%d|%d|%d|\n", in_fd, out_fd, err_fd);
     if (background) {
       child_proc_background(arguments);
     } else {
       child_proc(arguments);
     }
+    close(in_fd);
+    close(out_fd);
+    close(err_fd);
   }
 }
 
@@ -88,16 +108,79 @@ int parseArguments(char *buff, char **args) {
   return i;
 }
 
+bool checkRedIn(char **args, int n) {
+  if (n < 3) {
+    return 0;
+  }
+  if (strcmp(args[n - 2], "<") != 0) {
+    return 0;
+  }
+  in_fd = open(args[n - 1], O_RDONLY);
+  if (in_fd < 0) {
+    d_log("Error in opening file.\n");
+    exit(1);
+  }
+  args[n - 1] = NULL;
+  args[n - 2] = NULL;
+  return 1;
+}
+
+bool checkRedOut(char **args, int n) {
+  if (n < 3) {
+    return 0;
+  }
+  if (strcmp(args[n - 2], ">") != 0) {
+    return 0;
+  }
+  out_fd = open(args[n - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  if (out_fd < 0) {
+    d_log("Error in opening file.\n");
+    exit(1);
+  }
+  args[n - 1] = NULL;
+  args[n - 2] = NULL;
+  return 1;
+}
+
+bool checkRedOut_a(char **args, int n) {
+  if (n < 3) {
+    return 0;
+  }
+  if (strcmp(args[n - 2], ">>") != 0) {
+    return 0;
+  }
+  out_fd = open(args[n - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+  if (in_fd < 0) {
+    d_log("Error in opening file.\n");
+    exit(1);
+  }
+  args[n - 1] = NULL;
+  args[n - 2] = NULL;
+  return 1;
+}
+
 void tee(int in, int out1, int out2) {
   char BUFF[BUFFLEN];
-  int n = 0;
-  // puts("-- take a cop of tee --");
+  int n = 0, offset = 0;
+  // fputs("-- take a cop of tee --", stderr);
   while ((n = read(in, BUFF, BUFFLEN)) > 0) {
-    // printf("|%s(%d)|", BUFF, n);
-    write(out1, BUFF, n);
-    write(out2, BUFF, n);
+    // fprintf(stderr, "|>%s(%d)<|\n", BUFF, n);
+    if (out1 >= 0) {
+      offset = write(out1, BUFF, n);
+      if (offset < 0) {
+        d_log("error teeing to out1\n");
+        exit(1);
+      }
+    }
+    if (out2 >= 0) {
+      offset = write(out2, BUFF, n);
+      if (offset < 0) {
+        d_log("error teeing to out2\n");
+        exit(1);
+      }
+    }
   }
-  // puts("-- enough --");
+  // fputs("-- enough --", stderr);
 }
 
 void child_proc(char *arguments[ARGCNT]) {
@@ -121,10 +204,12 @@ void child_proc(char *arguments[ARGCNT]) {
     /* Read in a string from the pipe (fds[0])*/
     tee(fds[0], out_fd, b_fd);
     waitpid(childpid, &status, 0);
+    close(fds[0]);
   } else {
     /* Child process closes up input side of pipe */
     close(fds[0]);
-    dup2(fds[1], out_fd);
+		dup2(in_fd, 0);
+    dup2(fds[1], 1);
     execvp(arguments[0], arguments);
 
     exit(0);
