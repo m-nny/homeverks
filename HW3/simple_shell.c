@@ -55,6 +55,8 @@ void free_cmd(command *cmd);
 
 bool run_pipe(command *cmd);
 
+void run_command(command *cmd, bool background);
+
 int b_fd = -1;
 
 int main(int argc, char **argv) {
@@ -75,6 +77,7 @@ int main(int argc, char **argv) {
 
     for (;;) {
         d_log("Please enter a command:   ");
+        fflush(stdout);
         fgets(buff, CMDLEN, stdin);
         d_log2(buff);
         buff[strlen(buff) - 1] = '\0';
@@ -96,15 +99,7 @@ int main(int argc, char **argv) {
         }
         normalize_cmd(cur_cmd);
         // printf("|%d|%d|%d|\n", in_fd, out_fd, err_fd);
-        if (run_pipe(cur_cmd)) {
-
-        } else {
-            if (background) {
-                child_proc_background(cur_cmd);
-            } else {
-                child_proc(cur_cmd);
-            }
-        }
+        run_command(cur_cmd, background);
         free_cmd(cur_cmd);
     }
 }
@@ -243,7 +238,7 @@ command *split_commands(command *cmd) {
             break;
         }
     }
-    fprintf(stderr, "|%s(%d)|>%d<\n", cmd->args[0], cmd->argc, x);
+//    fprintf(stderr, "|%s(%d)|>%d<\n", cmd->args[0], cmd->argc, x);
     if (x == -1) {
         return NULL;
     }
@@ -257,16 +252,16 @@ command *split_commands(command *cmd) {
     cmd->argc = x;
     rm->args[y] = NULL;
     cmd->args[x] = NULL;
-    for (int i = 0; i < cmd->argc; i++) {
-        fprintf(stderr, "|%s", cmd->args[i]);
-    }
-    fprintf(stderr, "|\n");
-    for (int i = 0; i < rm->argc; i++) {
-        fprintf(stderr, "|%s", rm->args[i]);
-    }
-    fprintf(stderr, "|\n");
-    fprintf(stderr, "\\\\_____//\n");
     return rm;
+}
+
+void run_command(command *cmd, bool background) {
+    if (run_pipe(cmd))
+        return;
+    if (background)
+        child_proc_background(cmd);
+    else
+        child_proc(cmd);
 }
 
 bool run_pipe(command *cmd) {
@@ -275,60 +270,64 @@ bool run_pipe(command *cmd) {
 
     command *rest = split_commands(cmd);
     if (rest == NULL) {
-        return 0;
+        return false;
     }
-    int childpid;
+//    fprintf(stderr, "pipe: %d<->%d\n", total_in, total_out);
+//    fflush(stderr);
+    int child_pid;
     int status;
     int fds[2];
 
     pipe(fds);
-    childpid = fork();
-    if (childpid < 0) {
+    child_pid = fork();
+    if (child_pid < 0) {
         d_log("Error in fork.\n");
         exit(1);
     }
-    if (childpid == 0) {
+    if (child_pid == 0) {
         /* Child process closes up input side of pipe */
         close(fds[0]);
         cmd->in_fd = total_in;
         cmd->out_fd = fds[1];
-        child_proc(cmd);
+        run_command(cmd, false);
         exit(0);
     } else {
         /* Parent process closes up output side of pipe */
         close(fds[1]);
 
+        waitpid(child_pid, &status, 0);
+
         /* Read in a string from the pipe (fds[0])*/
         rest->in_fd = fds[0];
         rest->out_fd = total_out;
-        run_pipe(rest);
-        waitpid(childpid, &status, 0);
+        run_command(rest, false);
         close(fds[0]);
     }
-    return 1;
+    return true;
 }
 
 void child_proc(command *cmd) {
-    int childpid;
+//    fprintf(stderr, "child:%d<->%d\n", cmd->in_fd, cmd->out_fd);
+    int child_pid;
     int status;
     int fds[2];
 
     pipe(fds);
 
-    childpid = fork();
+    child_pid = fork();
 
-    if (childpid < 0) {
+    if (child_pid < 0) {
         d_log("Error in fork.\n");
         exit(1);
     }
 
-    if (childpid != 0) {
+    if (child_pid != 0) {
         /* Parent process closes up output side of pipe */
         close(fds[1]);
 
         /* Read in a string from the pipe (fds[0])*/
         tee(fds[0], cmd->out_fd, b_fd);
-        waitpid(childpid, &status, 0);
+        waitpid(child_pid, &status, 0);
         close(fds[0]);
     } else {
         /* Child process closes up input side of pipe */
