@@ -8,3 +8,6 @@ set_target_properties(client.out PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CU
 
 add_executable(echoserver.out echoserver/echoserver.c echoserver/passivesock.c)
 set_target_properties(echoserver.out PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/echoserver/")
+
+add_executable(gameserver.out echoserver/gameserver.c echoserver/passivesock.c)
+set_target_properties(gameserver.out PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/echoserver/")
