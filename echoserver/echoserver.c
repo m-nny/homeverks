@@ -8,88 +8,76 @@
 #include <sys/time.h>
 #include <netinet/in.h>
 
-#define	QLEN			5
-#define	BUFSIZE			4096
+#define    QLEN            5
+#define    BUFSIZE            4096
 
-int passivesock( char *service, char *protocol, int qlen, int *rport );
+int passivesock(char *service, char *protocol, int qlen, int *rport);
 
 /*
 **	This poor server ... only serves one client at a time
 */
-int
-main( int argc, char *argv[] )
-{
-	char			buf[BUFSIZE];
-	char			*service;
-	struct sockaddr_in	fsin;
-	int			alen;
-	int			msock;
-	int			ssock;
-	int			rport = 0;
-	int			cc;
-	
-	switch (argc) 
-	{
-		case	1:
-			// No args? let the OS choose a port and tell the user
-			rport = 1;
-			break;
-		case	2:
-			// User provides a port? then use it
-			service = argv[1];
-			break;
-		default:
-			fprintf( stderr, "usage: server [port]\n" );
-			exit(-1);
-	}
+int main(int argc, char *argv[]) {
+    char buf[BUFSIZE];
+    char *service;
+    struct sockaddr_in fsin;
+    int alen;
+    int msock;
+    int rport = 0;
+    int cc;
 
-	msock = passivesock( service, "tcp", QLEN, &rport );
-	if (rport)
-	{
-		//	Tell the user the selected port
-		printf( "server: port %d\n", rport );	
-		fflush( stdout );
-	}
+    switch (argc) {
+        case 1:
+            // No args? let the OS choose a port and tell the user
+            rport = 1;
+            break;
+        case 2:
+            // User provides a port? then use it
+            service = argv[1];
+            break;
+        default:
+            fprintf(stderr, "usage: server [port]\n");
+            exit(-1);
+    }
 
-	
-	for (;;)
-	{
-		int	ssock;
+    msock = passivesock(service, "tcp", QLEN, &rport);
+    if (rport) {
+        //	Tell the user the selected port
+        printf("server: port %d\n", rport);
+        fflush(stdout);
+    }
 
-		alen = sizeof(fsin);
-		ssock = accept( msock, (struct sockaddr *)&fsin, (socklen_t *)&alen );
-		if (ssock < 0)
-		{
-			fprintf( stderr, "accept: %s\n", strerror(errno) );
-			exit(-1);
-		}
 
-		printf( "A client has arrived for echoes.\n" );
-		fflush( stdout );
+    for (;;) {
+        int ssock;
 
-		/* start working for this guy */
-		/* ECHO what the client says */
-		for (;;)
-		{
-			if ( (cc = read( ssock, buf, BUFSIZE )) <= 0 )
-			{
-				printf( "The client has gone.\n" );
-				close(ssock);
-				break;
-			}
-			else
-			{
-				buf[cc] = '\0';
-				printf( "The client says: %s\n", buf );
-				if ( write( ssock, buf, cc ) < 0 )
-				{
-					/* This guy is dead */
-					close( ssock );
-					break;
-				}
-			}
-		}
-	}
+        alen = sizeof(fsin);
+        ssock = accept(msock, (struct sockaddr *) &fsin, (socklen_t *) &alen);
+        if (ssock < 0) {
+            fprintf(stderr, "accept: %s\n", strerror(errno));
+            exit(-1);
+        }
+
+        printf("A client has arrived for echoes.\n");
+        fflush(stdout);
+
+        /* start working for this guy */
+        /* ECHO what the client says */
+        for (;;) {
+            if ((cc = (int) read(ssock, buf, BUFSIZE)) <= 0) {
+                printf("The client has gone.\n");
+                close(ssock);
+                break;
+            } else {
+                buf[cc] = '\0';
+                printf("The client says: %s\n", buf);
+                if (write(ssock, buf, (size_t) cc) < 0) {
+                    /* This guy is dead */
+                    close(ssock);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 
