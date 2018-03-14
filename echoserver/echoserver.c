@@ -8,22 +8,44 @@
 #include <sys/time.h>
 #include <netinet/in.h>
 
-#define    QLEN            5
-#define    BUFSIZE            4096
+#define     QLEN            5
+#define     BUFSIZE         4096
+#define     THREADS         100
 
 int passivesock(char *service, char *protocol, int qlen, int *rport);
+
+void * handle_client(void * arg) {
+    char buf[BUFSIZE];
+    int cc;
+    int ssock = (int)arg;
+    for (;;) {
+        if ((cc = (int) read(ssock, buf, BUFSIZE)) <= 0) {
+            printf("The client has gone.\n");
+            close(ssock);
+            break;
+        } else {
+            buf[cc] = '\0';
+            printf("The client says: %s\n", buf);
+            if (write(ssock, buf, (size_t) cc) < 0) {
+                /* This guy is dead */
+                close(ssock);
+                break;
+            }
+        }
+    }
+}
 
 /*
 **	This poor server ... only serves one client at a time
 */
 int main(int argc, char *argv[]) {
-    char buf[BUFSIZE];
     char *service;
     struct sockaddr_in fsin;
     int alen;
     int msock;
     int rport = 0;
-    int cc;
+    pthread_t threads[THREADS];
+    int last_thread = 0;
 
     switch (argc) {
         case 1:
@@ -44,8 +66,15 @@ int main(int argc, char *argv[]) {
         //	Tell the user the selected port
         printf("server: port %d\n", rport);
         fflush(stdout);
+    } else {
+        printf("server: port %s\n", service);
+        fflush(stdout);
     }
 
+    if (msock < 0) {
+        printf("There was error opening server");
+        return 0;
+    }
 
     for (;;) {
         int ssock;
@@ -62,21 +91,7 @@ int main(int argc, char *argv[]) {
 
         /* start working for this guy */
         /* ECHO what the client says */
-        for (;;) {
-            if ((cc = (int) read(ssock, buf, BUFSIZE)) <= 0) {
-                printf("The client has gone.\n");
-                close(ssock);
-                break;
-            } else {
-                buf[cc] = '\0';
-                printf("The client says: %s\n", buf);
-                if (write(ssock, buf, (size_t) cc) < 0) {
-                    /* This guy is dead */
-                    close(ssock);
-                    break;
-                }
-            }
-        }
+        pthread_create(&threads[last_thread++], NULL, handle_client, (void *) ssock);
     }
 }
 
