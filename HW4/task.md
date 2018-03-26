@@ -69,7 +69,9 @@ Example:
 A. A call to the system
 B. A function call that invokes the operating system to take some action
 C. A call to the operating system
+
 B
+
 2 Another question
     (and so on)
 ```
