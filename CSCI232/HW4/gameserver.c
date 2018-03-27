@@ -26,11 +26,13 @@ int passivesock(char *service, char *protocol, int qlen, int *rport);
 int last_client_id = 0;
 int group_size = 0;
 int current_group_size = 0;
+int answered_size = 0;
 char *client_names[THREADS];
 pthread_mutex_t mutex;
 pthread_cond_t cond;
-FILE * input_file;
-char * question, * answer;
+FILE *input_file;
+char *question, *answer;
+char *scoreboard;
 int q_len, a_len, winner;
 int points[THREADS];
 
@@ -73,7 +75,19 @@ void read_question() {
     } while (!(a_len >= 2 && answer[a_len - 2] == '\n' && answer[a_len - 1] == '\n'));
     answer[a_len - 2] = 0;
     winner = -1;
+    answered_size = 0;
     printf("|%s|%s|\n%d %d\n", question, answer, q_len, a_len);
+}
+
+void make_scoreboard() {
+    free(scoreboard);
+    scoreboard = calloc(BUFSIZE, sizeof(char));
+    int offset = 0;
+    offset = sprintf(scoreboard, "RESULT");
+    for (int i = 0; i < last_client_id; i++) {
+        offset += sprintf(scoreboard + offset, "|%s|%d", client_names[i], points[i]);
+    }
+    sprintf(scoreboard + offset, "\r\n");
 }
 
 void *handle_client(void *arg) {
@@ -157,7 +171,7 @@ void *handle_client(void *arg) {
     pthread_mutex_unlock(&mutex);
 
 
-    sock_assert ((cc = (int) write(ssock, question, (size_t)q_len)) > 0);
+    sock_assert ((cc = (int) write(ssock, question, (size_t) q_len)) > 0);
 
     sock_assert ((cc = (int) read(ssock, buf, BUFSIZE)) > 0);
     cc = normalize(buf, cc);
@@ -174,6 +188,34 @@ void *handle_client(void *arg) {
         pthread_mutex_unlock(&mutex);
     }
 
+    if (status == 2) {
+        points[client_id] += 2;
+    }
+    if (status == 1) {
+        points[client_id] += 1;
+    }
+    if (status == 0) {
+        points[client_id] -= 1;
+    }
+
+    pthread_mutex_lock(&mutex);
+    answered_size++;
+    pthread_cond_broadcast(&cond);
+    pthread_mutex_unlock(&mutex);
+
+    while (answered_size < group_size) {
+        pthread_mutex_lock(&mutex);
+        pthread_cond_wait(&cond, &mutex);
+        pthread_mutex_unlock(&mutex);
+    }
+
+    pthread_mutex_lock(&mutex);
+    if (scoreboard == NULL) {
+        make_scoreboard();
+    }
+    pthread_mutex_unlock(&mutex);
+
+    sock_assert ((cc = (int) write(ssock, scoreboard, strlen(scoreboard))) > 0);
 
     pthread_mutex_lock(&mutex);
     current_group_size--;
@@ -189,7 +231,7 @@ int main(int argc, char *argv[]) {
     int rport = 0;
     pthread_t threads[THREADS];
     int last_thread = 0;
-    char * filename;
+    char *filename;
     switch (argc) {
         case 2:
             // one arg? let the OS choose a port and tell the user
