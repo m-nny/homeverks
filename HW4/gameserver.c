@@ -17,7 +17,6 @@
 #define     WELCOMESTR      "QS|ADMIN\r\n"
 #define     JOINSTR         "QS|JOIN\r\n"
 #define     FULLSTR         "QS|FULL\r\n"
-#define     QSTR            "Some weird question.\r\n"
 #define     WAITSTR         "WAIT\r\n"
 #define     sock_exit       {close(ssock); pthread_exit(NULL);}
 #define     sock_assert(x)  if (!(x)) {printf("Some error occurred\n"); sock_exit }
@@ -28,11 +27,12 @@ int last_client_id = 0;
 int group_size = 0;
 int current_group_size = 0;
 char *client_names[THREADS];
-int first_answer = -1;
 pthread_mutex_t mutex;
 pthread_cond_t cond;
 FILE * input_file;
 char * question, * answer;
+int q_len, a_len, winner;
+int points[THREADS];
 
 int parseArguments(char *buff, char **args) {
     int i = 0;
@@ -56,23 +56,23 @@ int normalize(char *str, int cc) {
 }
 
 void read_question() {
+    free(question);
+    free(answer);
     question = calloc(QUESTIONSIZE, sizeof(char));
     answer = calloc(QUESTIONSIZE, sizeof(char));
-    int q_len = 0;
+    q_len = 0;
     do {
         question[q_len++] = (char) fgetc(input_file);
     } while (!(q_len >= 2 && question[q_len - 2] == '\n' && question[q_len - 1] == '\n'));
     question[q_len - 2] = '\r';
     question[q_len - 1] = '\n';
     question[q_len] = 0;
-    int a_len = 0;
+    a_len = 0;
     do {
         answer[a_len++] = (char) fgetc(input_file);
     } while (!(a_len >= 2 && answer[a_len - 2] == '\n' && answer[a_len - 1] == '\n'));
-    answer[a_len - 2] = '\r';
-    answer[a_len - 1] = '\n';
-    answer[a_len] = 0;
-
+    answer[a_len - 2] = 0;
+    winner = -1;
     printf("|%s|%s|\n%d %d\n", question, answer, q_len, a_len);
 }
 
@@ -149,29 +149,32 @@ void *handle_client(void *arg) {
         pthread_cond_wait(&cond, &mutex);
         pthread_mutex_unlock(&mutex);
     }
-    printf("[%s(%d), %s(%d)]\n", msg[0], (int) strlen(msg[0]), msg[1], (int) strlen(msg[1]));
-    sock_assert ((cc = (int) write(ssock, QSTR, strlen(QSTR))) > 0);
+
+    pthread_mutex_lock(&mutex);
+    if (question == NULL) {
+        read_question();
+    }
+    pthread_mutex_unlock(&mutex);
+
+
+    sock_assert ((cc = (int) write(ssock, question, (size_t)q_len)) > 0);
 
     sock_assert ((cc = (int) read(ssock, buf, BUFSIZE)) > 0);
     cc = normalize(buf, cc);
     printf("The client says: |[%s]|\n", buf);
     fflush(stdout);
 
-    status = -1;
-    pthread_mutex_lock(&mutex);
-    if (first_answer == -1) {
-        status = 1;
-        first_answer = client_id;
-        sprintf(buf, "Congratulations!!!\nYou answered first.\r\n");
-        sock_assert ((cc = (int) write(ssock, buf, strlen(buf))) > 0);
-        printf("%s won this game\n", client_names[first_answer]);
-        fflush(stdout);
+    status = strcmp(buf, answer) == 0;
+    if (status > 0) {
+        pthread_mutex_lock(&mutex);
+        if (winner == -1) {
+            winner = client_id;
+            status = 2;
+        }
+        pthread_mutex_unlock(&mutex);
     }
-    pthread_mutex_unlock(&mutex);
-    if (status == -1) {
-        sprintf(buf, "Sorry, too late!!!\n%s were the one, who answered first.\r\n", client_names[first_answer]);
-        sock_assert ((cc = (int) write(ssock, buf, strlen(buf))) > 0);
-    }
+
+
     pthread_mutex_lock(&mutex);
     current_group_size--;
     pthread_mutex_unlock(&mutex);
@@ -217,6 +220,12 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "There was error opening server\n");
         return 0;
     }
+    input_file = fopen(filename, "r");
+    if (input_file == NULL) {
+        fprintf(stderr, "There was error opening quiz file\n");
+        return 0;
+    }
+
     pthread_mutex_init(&mutex, NULL);
     for (;;) {
         int ssock;
