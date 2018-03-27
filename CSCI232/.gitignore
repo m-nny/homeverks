@@ -1,7 +1,70 @@
+# Homework 1
+__test__
+_run_.tar.gz
+HW2/image.png
+HW2/huge_image.png
+test.c
+# backup_file.txt
 
-# Created by https://www.gitignore.io/api/java,clion
 
-### CLion ###
+
+# Created by https://www.gitignore.io/api/c,intellij
+
+### C ###
+# Prerequisites
+*.d
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+
+### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
@@ -55,7 +118,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-### CLion Patch ###
+### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 
 # *.iml
@@ -66,29 +129,5 @@ fabric.properties
 # Sonarlint plugin
 .idea/sonarlint
 
-### Java ###
-# Compiled class file
-*.class
 
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
-
-# End of https://www.gitignore.io/api/java,clion
+# End of https://www.gitignore.io/api/c,intellij
