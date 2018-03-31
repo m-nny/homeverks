@@ -4,7 +4,7 @@
 #include<unistd.h>
 #include<fcntl.h>
 #include<sys/types.h>
-#include <errno.h>
+#include<errno.h>
 
 #define BUFLEN 1024
 #define BUFTYPE unsigned char

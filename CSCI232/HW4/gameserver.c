@@ -21,6 +21,12 @@
 #define     NOANSSTR        "ANS|NOANS"
 #define     sock_exit       {close(ssock); pthread_exit(NULL);}
 #define     sock_assert(x)  if (!(x)) {printf("Some error occurred\n"); sock_exit }
+#define     sock_assert2(x)  if (!(x)) {\
+                                printf("Some error occurred\n"); \
+                                pthread_mutex_lock(&mutex);\
+                                current_group_size--;\
+                                pthread_mutex_unlock(&mutex);\
+                                sock_exit}
 
 int passivesock(char *service, char *protocol, int qlen, int *rport);
 
@@ -37,7 +43,7 @@ FILE *input_file;
 char *question, *answer;
 char *scoreboard;
 int q_len, a_len, winner = -1;
-int global_status = 0;
+int admin_is_here = 0;
 int points[THREADS];
 
 int parseArguments(char *buff, char **args) {
@@ -124,8 +130,8 @@ void *handle_client(void *arg) {
     int client_id = -1;
 
     pthread_mutex_lock(&mutex);
-    if (global_status == 0) {
-        global_status = 1;
+    if (admin_is_here == 0) {
+        admin_is_here = 1;
         status = 1;
     } else if (current_group_size >= group_size) {
         status = 2;
@@ -139,16 +145,28 @@ void *handle_client(void *arg) {
     }
 
     if (status == 1) {
-        sock_assert ((cc = (int) write(ssock, WELCOMESTR, strlen(WELCOMESTR))) > 0);
-        sock_assert ((cc = (int) read(ssock, buf, BUFSIZE)) > 0);
+        if ((cc = (int) write(ssock, WELCOMESTR, strlen(WELCOMESTR))) <= 0) {
+            admin_is_here = 0;
+            sock_exit;
+        }
+        if ((cc = (int) read(ssock, buf, BUFSIZE)) <= 0) {
+            admin_is_here = 0;
+            sock_exit;
+        }
         cc = normalize(buf, cc);
         printf("The client says: |[%s]|\n", buf);
 
         msg_c = parseArguments(buf, msg);
-        sock_assert (msg_c == 3 && strcmp(msg[0], "GROUP") == 0);
+        if (msg_c == 3 && strcmp(msg[0], "GROUP") != 0) {
+            admin_is_here = 0;
+            sock_exit;
+        }
         printf("[%s(%d), %s(%d), %s(%d)]\n", msg[0], (int) strlen(msg[0]),
                msg[1], (int) strlen(msg[1]), msg[2], (int) strlen(msg[2]));
-        sock_assert ((cc = (int) write(ssock, WAITSTR, strlen(WAITSTR))) > 0);
+        if ((cc = (int) write(ssock, WAITSTR, strlen(WAITSTR))) <= 0) {
+            admin_is_here = 0;
+            sock_exit;
+        }
 
         pthread_mutex_lock(&mutex);
         client_id = last_client_id++;
@@ -216,9 +234,9 @@ void *handle_client(void *arg) {
         }
 
 
-        sock_assert ((cc = (int) write(ssock, question, (size_t) q_len)) > 0);
+        sock_assert2 ((cc = (int) write(ssock, question, (size_t) q_len)) > 0);
 
-        sock_assert ((cc = (int) read(ssock, buf, BUFSIZE)) > 0);
+        sock_assert2 ((cc = (int) read(ssock, buf, BUFSIZE)) > 0);
         cc = normalize(buf, cc);
         printf("The client says: |[%s]|\n", buf);
         fflush(stdout);
@@ -268,13 +286,13 @@ void *handle_client(void *arg) {
     }
     pthread_mutex_unlock(&mutex);
 
-    sock_assert ((cc = (int) write(ssock, scoreboard, strlen(scoreboard))) > 0);
+    sock_assert2 ((cc = (int) write(ssock, scoreboard, strlen(scoreboard))) > 0);
     pthread_mutex_lock(&mutex);
     current_group_size--;
     if (current_group_size == 0) {
         cleanup();
         rewind(input_file);
-        global_status = 0;
+        admin_is_here = 0;
         ready_to_start = 0;
         last_client_id = 0;
     }
