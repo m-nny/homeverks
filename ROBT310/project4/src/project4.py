@@ -5,7 +5,8 @@ import numpy as np
 image_window = "Frame"
 config_window = "Config"
 cap = None
-
+frame = None
+magic_number = (10, 2, 0, 0.3)
 MouseX, MouseY = (0, 0)
 
 
@@ -17,14 +18,15 @@ def setup():
     print("Setup")
     global cap
     cap = cv.VideoCapture(0)
-    cv.namedWindow(image_window, cv.WINDOW_AUTOSIZE)
     cv.namedWindow(config_window, cv.WINDOW_NORMAL)
-    cv.resizeWindow(config_window, 720, 80)
+    cv.namedWindow(image_window, cv.WINDOW_AUTOSIZE)
+    cv.resizeWindow(config_window, 720, 240)
 
     cv.createTrackbar('R', config_window, 0, 255, nothing)
     cv.createTrackbar('G', config_window, 0, 255, nothing)
     cv.createTrackbar('B', config_window, 0, 255, nothing)
-    cv.createTrackbar('Radius', config_window, 0, 255, nothing)
+    cv.createTrackbar('Radius', config_window, 30, 442, nothing)
+    cv.createTrackbar('Magic', config_window, 1, 1, nothing)
 
     # cap.set(cv.CAP_PROP_FPS, 1)
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, 480)
@@ -45,8 +47,12 @@ def run():
         g = cv.getTrackbarPos('G', config_window)
         b = cv.getTrackbarPos('B', config_window)
         radius = cv.getTrackbarPos('Radius', config_window)
+        is_magic = cv.getTrackbarPos('Magic', config_window)
 
-        f_frame = selective_color(frame, (b, g, r), radius)
+        if is_magic == 1:
+            f_frame = make_some_magic(frame)
+        else:
+            f_frame = selective_color(frame, (b, g, r), radius)
 
         cv.imshow(image_window, f_frame)
 
@@ -89,6 +95,40 @@ def selective_color(image, point, radius):
     # gray = np.repeat(gray[:, :, np.newaxis], 3, axis=2)
     output = np.copy(image)
     output[mask] = gray[mask]
+    return output
+
+
+def make_some_magic(image):
+    global magic_number
+    # tmp = cv.cvtColor(image, cv.COLOR_BGR2YCrCb)
+    tmp = image
+    y, cr, cb = cv.split(tmp)
+    feedback, delay_x, delay_y, decay = magic_number
+    cr = make_some_magic_on_slice(cr, feedback, delay_x, delay_y, decay)
+    cb = make_some_magic_on_slice(cb, feedback, -delay_x, -delay_y, decay)
+    output = cv.merge((y, cr, cb))
+
+    # output = cv.cvtColor(output, cv.COLOR_YCrCb2BGR)
+    # output = cv.equalizeHist(output)
+    return output
+
+
+def make_some_magic_on_slice(image, feedback, delay_x, delay_y, decay):
+    output = np.zeros(image.shape, dtype=np.float32)
+    layer = np.copy(image)
+    coef = 1
+    d_decay = 1
+    for i in range(feedback):
+        layer = np.roll(layer, (delay_x, delay_y), axis=(0, 1)) * decay
+        d_decay *= decay
+        coef += d_decay * decay
+        output = output + layer
+    output /= coef
+    mx = np.amax(output)
+    # output /= mx
+    output = np.uint8(output)
+    output = cv.equalizeHist(output)
+
     return output
 
 
