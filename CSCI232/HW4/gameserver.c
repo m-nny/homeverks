@@ -95,6 +95,7 @@ void read_question() {
     sprintf(answer, "ANS|%s", buf);
 
     answered_size = 0;
+    winner = -1;
     printf("|%s|%s|\n%d %d\n", question, answer, q_len, a_len);
 }
 
@@ -117,7 +118,7 @@ void cleanup() {
     scoreboard = NULL;
     q_len = 0;
     a_len = 0;
-    winner = -1;
+    //winner = -1;
 }
 
 void *handle_client(void *arg) {
@@ -278,6 +279,12 @@ void *handle_client(void *arg) {
             pthread_cond_wait(&cond, &mutex);
         }
         pthread_mutex_unlock(&mutex);
+        if (winner != -1) {
+            sprintf(buf, "WIN|%s\r\n", client_names[winner]);
+        } else {
+            sprintf(buf, "WIN|NOWINNER\r\n");
+        }
+        sock_assert2(write(ssock, buf, strlen(buf)) > 0);
     }
 
     pthread_mutex_lock(&mutex);
