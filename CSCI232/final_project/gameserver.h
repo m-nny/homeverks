@@ -27,11 +27,11 @@ struct question {
 
 struct client {
     int id;
-    int ssock;
+    int sock;
     char * name;
     int n_len;
     int point;
-    quiz_group * group;
+    struct quiz_group * group;
 };
 
 struct quiz_group {
@@ -41,7 +41,7 @@ struct quiz_group {
     int current_size;
     int dedicated_size;
     client * admin;
-    client * members; // array for the members of the group
+    struct client ** members; // array for the members of the group
 };
 
 // 0 is for the "hub".
@@ -72,15 +72,17 @@ int read_msg_cr(client * cl, char * str);
 // returns status of read
 int read_msg_size(client * cl, char * str);
 
+int find_group(char * group_name);
+
 // Safely (mutex) adds and removes member to the group
 // returns status of the operation:
 // 0 - ok
 // add: 1 - no such group, 2 - full group, 3 - already there
 // remove: 1 - no such group, 2 - no such client
-int add_member(char * group_name, client * cl);
-int remove_member(char * group_name, client * cl);
+int add_member(int group_id, client * cl);
+int remove_member(int group_id, client * cl);
 
-// Creates client, checks if there is already
+// Only creates client object
 client * create_member(int sock);
 // Close connection, remove from groups, and all lists
 void close_connection(client * cl);

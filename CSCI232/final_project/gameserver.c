@@ -32,23 +32,85 @@ int normalize(char *str, int cc) {
     return cc;
 }
 
-void * hub(void * args) {
+void *hub(void *args) {
+    quiz_group *current_group = all_groups;
     printf("Hub started!\n");
     fflush(stdout);
-    for (int i = 0; i < 10; i++) {
+    for (;;) {
+        printf("There are %d clients in hub:\n", current_group->current_size);
+        for (int i = 0; i < current_group->current_size; i++) {
+            printf("%d-%s\n", current_group->members[i]->sock, current_group->members[i]->name);
+        }
+        fflush(stdout);
         sleep(1);
-        printf("Hub is awaken\n");
     }
     printf("Hub ended\n");
     fflush(stdout);
     pthread_exit(NULL);
 }
 
-void * new_client(void * args) {
-    int sock = (int)args;
+void *new_client(void *args) {
+    int sock = (int) args;
     printf("new thread here, %d has come!\n", sock);
     fflush(stdout);
+    client *cl = create_member(sock);
+    if (cl == NULL) {
+        printf("Couldn't create a client for %d\n", sock);
+    } else {
+        int status = add_member(0, cl);
+        if (status == 0) {
+            printf("Client %d joined hub\n", sock);
+        }
+        if (status == 1) {
+            printf("There is no such group\n");
+        }
+        if (status == 2) {
+            printf("Group is already full\n");
+        }
+        if (status == 3) {
+            printf("Client is already in that group\n");
+        }
+        fflush(stdout);
+    }
     pthread_exit(NULL);
+}
+
+client * create_member(int sock) {
+    client * current_client = all_clients + last_client;
+    current_client->id = last_client++;
+    current_client->group = NULL;
+    current_client->name = NULL;
+    current_client->n_len = 0;
+    current_client->point = 0;
+    current_client->sock = sock;
+    return current_client;
+}
+
+int add_member(int group_id, client *cl) {
+    if (group_id < 0 || group_id > MAX_GROUP_NUM)
+        return 1;
+    quiz_group *current_group = all_groups + group_id;
+    pthread_mutex_lock(groups_mutex + group_id);
+    if (current_group->dedicated_size <= 0) {
+        pthread_mutex_unlock(groups_mutex + group_id);
+        return 1;
+    }
+    if (current_group->current_size == current_group->dedicated_size) {
+        return 2;
+    }
+    for (int i = 0; i < current_group->current_size; i++) {
+        if (current_group->members[i]->id == cl->id)
+            return 3;
+    }
+    current_group->members[current_group->current_size] = cl;
+    current_group->current_size++;
+    return 0;
+}
+
+void init() {
+    all_groups->id = 0;
+    all_groups->dedicated_size = MAX_CLIENT_NUM;
+    all_groups->members = calloc(MAX_CLIENT_NUM, sizeof(client *));
 }
 
 int main(int argc, char *argv[]) {
@@ -88,7 +150,9 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    pthread_create(&all_threads[last_thread++], NULL, hub, NULL);
+    init();
+
+    pthread_create(all_threads + (last_thread++), NULL, hub, NULL);
 
     for (;;) {
         int ssock;
