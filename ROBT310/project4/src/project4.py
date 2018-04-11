@@ -26,7 +26,7 @@ def setup():
     cv.createTrackbar('G', config_window, 0, 255, nothing)
     cv.createTrackbar('B', config_window, 0, 255, nothing)
     cv.createTrackbar('Radius', config_window, 30, 442, nothing)
-    cv.createTrackbar('Magic', config_window, 1, 1, nothing)
+    cv.createTrackbar('Magic', config_window, 0, 1, nothing)
 
     # cap.set(cv.CAP_PROP_FPS, 1)
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, 480)
@@ -102,11 +102,11 @@ def make_some_magic(image):
     global magic_number
     # tmp = cv.cvtColor(image, cv.COLOR_BGR2YCrCb)
     tmp = image
-    y, cr, cb = cv.split(tmp)
+    b, g, r = cv.split(tmp)
     feedback, delay_x, delay_y, decay = magic_number
-    cr = make_some_magic_on_slice(cr, feedback, delay_x, delay_y, decay)
-    cb = make_some_magic_on_slice(cb, feedback, -delay_x, -delay_y, decay)
-    output = cv.merge((y, cr, cb))
+    g = make_some_magic_on_slice(g, feedback, delay_x, delay_y, decay)
+    r = make_some_magic_on_slice(r, feedback, -delay_x, -delay_y, decay)
+    output = cv.merge((b, g, r))
 
     # output = cv.cvtColor(output, cv.COLOR_YCrCb2BGR)
     # output = cv.equalizeHist(output)
