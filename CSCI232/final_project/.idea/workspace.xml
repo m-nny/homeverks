@@ -12,7 +12,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b2cab43b-4b48-420c-a04f-37b014d387e9" name="Default" comment="Checkpoint&#10;add_member">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gameserver.c" beforeDir="false" afterPath="$PROJECT_DIR$/gameserver.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gameserver.h" beforeDir="false" afterPath="$PROJECT_DIR$/gameserver.h" afterDir="false" />
@@ -27,23 +26,44 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.6167002">
+    <splitter split-orientation="horizontal" split-proportion="0.53722334">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="gameserver.c" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/gameserver.c">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="690">
-                  <caret line="72" column="23" lean-forward="true" selection-start-line="72" selection-start-column="23" selection-end-line="72" selection-end-column="23" />
+                <state relative-caret-position="185">
+                  <caret line="186" column="35" selection-start-line="186" selection-start-column="35" selection-end-line="186" selection-end-column="35" />
                   <folding>
                     <element signature="e#286#513#0" />
                     <element signature="e#515#769#0" />
-                    <element signature="e#1276#1947#0" />
                     <element signature="e#1988#2080#0" />
+                    <element signature="e#1039#1079#0" />
+                    <element signature="e#3408#3440#0" />
+                    <element signature="e#3902#3936#0" />
                     <element signature="e#3602#4300#0" />
                     <element signature="e#4348#4995#0" />
                     <element signature="e#3003#3039#0" />
+                    <element signature="e#3728#3764#0" />
                     <element signature="e#3847#4106#0" />
+                    <element signature="e#3875#4857#0" />
+                    <element signature="e#4859#6194#0" />
+                    <element signature="e#3019#4510#0" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="gameserver.h" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/gameserver.h">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="162">
+                  <caret line="90" column="60" lean-forward="true" selection-start-line="90" selection-start-column="60" selection-end-line="90" selection-end-column="60" />
+                  <folding>
+                    <element signature="e#0#2#0" />
+                    <element signature="e#330#409#1" />
+                    <element signature="e#412#519#1" />
+                    <element signature="e#522#740#1" />
                   </folding>
                 </state>
               </provider>
@@ -78,6 +98,14 @@
     <findStrings>
       <find>create</find>
       <find>has go</find>
+      <find>add_mem</find>
+      <find>add</find>
+      <find>add_</find>
+      <find>read(</find>
+      <find>write(</find>
+      <find>cl</find>
+      <find>cl</find>
+      <find>*cl</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -162,12 +190,12 @@
       <updated>1523483792990</updated>
       <workItem from="1523483794385" duration="615000" />
       <workItem from="1523484576152" duration="4583000" />
-      <workItem from="1523489722336" duration="6736000" />
+      <workItem from="1523489722336" duration="11490000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11934000" />
+    <option name="totallyTimeSpent" value="16688000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="994" height="900" extended-state="0" />
@@ -179,11 +207,11 @@
       <window_info anchor="bottom" id="CMake" order="7" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.5020576" side_tool="true" weight="0.3278302" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4989712" weight="0.31132075" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4989712" visible="true" weight="0.31132075" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.24174528" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.24174528" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -207,7 +235,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="8" />
+      <option name="time" value="9" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -218,12 +246,18 @@
           <folding>
             <element signature="e#286#513#0" />
             <element signature="e#515#769#0" />
-            <element signature="e#1276#1947#0" />
             <element signature="e#1988#2080#0" />
+            <element signature="e#1039#1079#0" />
+            <element signature="e#3408#3440#0" />
+            <element signature="e#3902#3936#0" />
             <element signature="e#3602#4300#0" />
             <element signature="e#4348#4995#0" />
             <element signature="e#3003#3039#0" />
+            <element signature="e#3728#3764#0" />
             <element signature="e#3847#4106#0" />
+            <element signature="e#3875#4857#0" />
+            <element signature="e#4859#6194#0" />
+            <element signature="e#3019#4510#0" />
           </folding>
         </state>
       </provider>
@@ -234,8 +268,9 @@
           <caret line="29" column="12" selection-start-line="29" selection-start-column="12" selection-end-line="29" selection-end-column="12" />
           <folding>
             <element signature="e#0#2#0" />
-            <element signature="e#330#411#1" />
-            <element signature="e#414#535#1" />
+            <element signature="e#330#409#1" />
+            <element signature="e#412#519#1" />
+            <element signature="e#522#740#1" />
           </folding>
         </state>
       </provider>
@@ -255,12 +290,18 @@
           <folding>
             <element signature="e#286#513#0" />
             <element signature="e#515#769#0" />
-            <element signature="e#1276#1947#0" />
             <element signature="e#1988#2080#0" />
+            <element signature="e#1039#1079#0" />
+            <element signature="e#3408#3440#0" />
+            <element signature="e#3902#3936#0" />
             <element signature="e#3602#4300#0" />
             <element signature="e#4348#4995#0" />
             <element signature="e#3003#3039#0" />
+            <element signature="e#3728#3764#0" />
             <element signature="e#3847#4106#0" />
+            <element signature="e#3875#4857#0" />
+            <element signature="e#4859#6194#0" />
+            <element signature="e#3019#4510#0" />
           </folding>
         </state>
       </provider>
@@ -271,8 +312,9 @@
           <caret line="8" selection-start-line="8" selection-end-line="8" />
           <folding>
             <element signature="e#0#2#0" />
-            <element signature="e#330#411#1" />
-            <element signature="e#414#535#1" />
+            <element signature="e#330#409#1" />
+            <element signature="e#412#519#1" />
+            <element signature="e#522#740#1" />
           </folding>
         </state>
       </provider>
@@ -291,15 +333,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/passivesock.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-30" />
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="64">
           <caret line="57" column="7" selection-start-line="57" selection-start-column="7" selection-end-line="57" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/passivesock.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gameserver.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="90" column="60" lean-forward="true" selection-start-line="90" selection-start-column="60" selection-end-line="90" selection-end-column="60" />
+          <folding>
+            <element signature="e#0#2#0" />
+            <element signature="e#330#409#1" />
+            <element signature="e#412#519#1" />
+            <element signature="e#522#740#1" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -311,31 +368,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gameserver.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10">
-          <caret line="66" column="4" selection-start-line="66" selection-start-column="4" selection-end-line="66" selection-end-column="4" />
-          <folding>
-            <element signature="e#0#2#0" />
-            <element signature="e#330#411#1" />
-            <element signature="e#414#535#1" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gameserver.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="690">
-          <caret line="72" column="23" lean-forward="true" selection-start-line="72" selection-start-column="23" selection-end-line="72" selection-end-column="23" />
+        <state relative-caret-position="185">
+          <caret line="186" column="35" selection-start-line="186" selection-start-column="35" selection-end-line="186" selection-end-column="35" />
           <folding>
             <element signature="e#286#513#0" />
             <element signature="e#515#769#0" />
-            <element signature="e#1276#1947#0" />
             <element signature="e#1988#2080#0" />
+            <element signature="e#1039#1079#0" />
+            <element signature="e#3408#3440#0" />
+            <element signature="e#3902#3936#0" />
             <element signature="e#3602#4300#0" />
             <element signature="e#4348#4995#0" />
             <element signature="e#3003#3039#0" />
+            <element signature="e#3728#3764#0" />
             <element signature="e#3847#4106#0" />
+            <element signature="e#3875#4857#0" />
+            <element signature="e#4859#6194#0" />
+            <element signature="e#3019#4510#0" />
           </folding>
         </state>
       </provider>

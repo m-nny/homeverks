@@ -11,36 +11,37 @@
 #define MAX_CLIENT_NUM    1020
 #define MAX_QUEST_LEN     2048
 #define MAX_QUEST_NUM     128
+#define MAX_TOKEN_CNT     15
 #define MAX_BUFFER_SIZE   2048
 #define SEPARATOR "|"
 #define QLEN 5
 
 struct question {
-    char * str;
+    char *str;
     int q_len;
-    char * ans;
+    char *ans;
     int a_len;
 };
 
 struct client {
     int id;
     int sock;
-    char * name;
+    char *name;
     int n_len;
     int point;
-    struct quiz_group * group;
+    int g_id;
 };
 
 struct q_group {
-    char * topic;
+    char *topic;
     int t_len;
     int id;
-    char * name;
+    char *name;
     int n_len;
     int c_size;
     int d_size;
-    struct client * admin;
-    struct client ** members; // array for the members of the group
+    struct client *admin;
+    struct client **members; // array for the members of the group
 };
 
 typedef struct question question;
@@ -62,38 +63,47 @@ client all_clients[1024];
 int l_client = 0;
 
 // In order to normalize string = remove trailing \r\n
-int normalize(char * str, int len);
+int normalize(char *str, int len);
+
 // Thread-safe parsing of the arguments by "|"
-int parse_args(char * str, char ** args);
+int parse_args(char *str, char **args);
+
 // Sort members by their points
-void sort_members(q_group * q_group);
+void sort_members(q_group *q_group);
 
 // reads message from client terminated with CRLF
 // returns status of read
 // 0 - ok
 // 1 - error, occured
-int read_msg_cr(client * cl, char * str);
+int read_msg_cr(client *cl, char *str);
+
 // reads message from client with given size in the message
 // returns status of read
-int read_msg_size(client * cl, char * str);
+int read_msg_size(client *cl, char *str);
 
-int find_group(char * group_name);
+int find_group(char *group_name);
+
 int open_groups(char **str);
 
-// Safely (mutex) adds and removes member to the group
+// adds and removes member to the group. Appropriate mutex should be locked before it
 // returns status of the operation:
 // 0 - ok
 // add: 1 - no such group, 2 - full group, 3 - already there
 // remove: 1 - no such group, 2 - no such client
-int add_member(int g_id, client * cl);
-int remove_member(int g_id, client * cl);
+int add_member(int g_id, client *c_client);
+int remove_member(int g_id, client *c_client);
 
 // Only creates client object
-client * create_member(int sock);
+client *create_client(int sock);
+
+q_group *create_group(int id, int dedicated_size);
+int destroy_group(int id);
+
 // Close connection, remove from groups, and all lists
-void close_connection(client * cl);
+void close_connection(client *cl);
 
 // Hub function
-void * hub(void * args);
+void *hub(void *args);
+
 // quiz-group function
-void * group_thread(void * args);
+void *group_thread(void *args);
