@@ -32,6 +32,12 @@ int normalize(char *str, int cc) {
     return cc;
 }
 
+void set_string(char *origin, char **dest, int *len) {
+    *len = (int) strlen(origin);
+    *dest = calloc((size_t) (*len) + 1, sizeof(char));
+    strcpy(*dest, origin);
+}
+
 client *create_client(int sock) {
     client *c_client = all_clients + l_client;
     c_client->id = l_client++;
@@ -53,12 +59,14 @@ int destory_client(client *c_client) {
 }
 
 q_group *create_group(int id, int dedicated_size) {
+    ///TO CHANGE
+    id = l_group;
     q_group *c_group = all_groups + (l_group++);
     c_group->c_size = 0;
     c_group->d_size = dedicated_size;
     free(c_group->members);
     c_group->members = calloc((size_t) dedicated_size, sizeof(client *));
-    c_group->id = id;
+    c_group->id = l_group;
     c_group->admin = NULL;
     free(c_group->name);
     c_group->name = NULL;
@@ -152,6 +160,24 @@ int find_group(char *name) {
     return -1;
 }
 
+int read_quiz(client *c_client) {
+    q_group *c_group = all_groups + c_client->g_id;
+    char *buffer = calloc(MAX_QUEST_NUM * MAX_QUEST_LEN + 10, sizeof(char));
+    int b_len = MAX_QUEST_NUM * MAX_QUEST_LEN + 9;
+    int offset = 0;
+    int need_size = b_len;
+    int cc;
+    do {
+        cc = (int) read(c_client->sock, buffer + offset, (size_t) need_size);
+        if (cc <= 0) {
+            return -1;
+        }
+        offset += cc;
+        need_size -= cc;
+    } while (need_size > 0);
+    return 1;
+}
+
 void init() {
     q_group *h_group = create_group(0, MAX_CLIENT_NUM);
     pthread_create(all_threads + (l_thread++), NULL, hub, NULL);
@@ -163,6 +189,86 @@ void init() {
     test_group->name = calloc(12, sizeof(char));
     strcpy(test_group->name, "some_name");
     /// TESTING ONLY
+}
+
+void handle_join(char **tokens, int cc, client *c_client) {
+    if (cc != 3) {
+        write(c_client->sock, "BAD|Wrong format\r\n", 18);
+        return;
+    }
+    remove_member(0, c_client);
+    int g_id = find_group(tokens[1]);
+    if (g_id < 0) {
+        cc = (int) write(c_client->sock, "BAD|No such group\r\n", 19);
+        if (cc <= 0) {
+            destroy_client(c_client);
+        }
+        return;
+    }
+    set_string(tokens[2], &(c_client->name), &(c_client->n_len));
+    int status = add_member(g_id, c_client);
+    switch (status) {
+        case 0:
+            cc = (int) write(c_client->sock, "OK\r\n", 4);
+            break;
+        case 1:
+            cc = (int) write(c_client->sock, "BAD|Group is full\r\n", 19);
+            break;
+        case 2:
+            cc = (int) write(c_client->sock, "BAD|Already there\r\n", 19);
+            break;
+        default:
+            break;
+    }
+    if (cc <= 0) {
+        destroy_client(c_client);
+    }
+}
+
+void handle_group(char **tokens, int cc, client *c_client) {
+    if (cc != 4) {
+        cc = (int) write(c_client->sock, "BAD|Wrong format\r\n", 18);
+        if (cc <= 0) {
+            destroy_client(c_client);
+        }
+        return;
+    }
+    char *e_ptr;
+    int g_size = (int) strtol(tokens[3], &e_ptr, 10);
+    if (tokens[3] == e_ptr) {
+        cc = (int) write(c_client->sock, "BAD|Wrong format\r\n", 18);
+        if (cc <= 0) {
+            destroy_client(c_client);
+        }
+        return;
+    }
+    q_group *c_group = create_group(-1, g_size);
+    set_string(tokens[1], &(c_group->topic), &(c_group->t_len));
+    set_string(tokens[2], &(c_group->name), &(c_group->n_len));
+
+    cc = (int) write(c_client->sock, "SENDQUIZ\r\n", 10);
+    if (cc <= 0) {
+        destroy_client(c_client);
+    }
+    return;
+    ///TODO
+    cc = read_quiz(c_client);
+    if (cc == -2) {
+        cc = (int) write(c_client->sock, "BAD|Wrong format\r\n", 18);
+        if (cc <= 0) {
+            destroy_client(c_client);
+        }
+        return;
+    }
+    if (cc <= 0) {
+        destroy_client(c_client);
+    }
+
+    pthread_mutex_lock(g_mutex);
+    remove_member(0, c_client);
+    pthread_mutex_unlock(g_mutex);
+    c_group->admin = c_client;
+    c_client->g_id = c_group->id;
 }
 
 void handle_free_client(char *msg, int cc, client *c_client) {
