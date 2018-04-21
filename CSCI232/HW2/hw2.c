@@ -8,7 +8,7 @@
 
 #define BUFLEN 1024
 #define BUFTYPE unsigned char
-#define _asssert(x) if (x == -1) {puts("there was unexpected error"); exit(1);}
+#define _asssert(x) if (x == -1) {puts("there was unexpected error\n"); exit(1);}
 #define bool _Bool
 #define true 1
 #define false 0
@@ -25,7 +25,7 @@ void * read_to_buffer(int fd, int len) {
 	BUFTYPE * buff = calloc(BUFLEN, sizeof(BUFTYPE));
 	int n = read(fd, buff, len);
 	if (n == -1) {
-		fprintf(stderr, "Probem reading file");
+		fprintf(stderr, "Probem reading file\n");
 		exit(1);
 	}
 	if (n != len) {
@@ -105,7 +105,7 @@ int main(int argc, char const *argv[]) {
 	}
   int image = open(argv[1], O_RDWR);
   if (image == -1) {
-		printf("There was error opening file %s", argv[1]);
+		printf("There was error opening file %s\n", argv[1]);
 		return 1;
 	}
 	// int offset = lseek(image, 8, SEEK_CUR);

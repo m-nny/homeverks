@@ -1,20 +1,18 @@
 import time
-
-import math
 from io import BytesIO, StringIO
 
 
-def lzw_compress(uncompressed: bytes) -> str:
+def lzw_compress(uncompressed: str) -> str:
     """Compress a string to a list of output symbols."""
     # Build the dictionary.
     dict_size = 256
     bit_len = 8
-    # dictionary = dict((chr(i), i) for i in range(dict_size))
     dictionary = {(i,): i for i in range(dict_size)}
 
     w = ()
     s_result = StringIO()
-    for c in uncompressed:
+    for i in range(0, len(uncompressed), 8):
+        c = int(uncompressed[i:i + 8], 2)
         wc = w + (c,)
         if wc in dictionary:
             w = wc
@@ -33,9 +31,11 @@ def lzw_compress(uncompressed: bytes) -> str:
         code = dictionary[w]
         s_result.write('{:0{}b}'.format(code, bit_len))
     return s_result.getvalue()
+    # b_result, rem = str_to_bytes(s_result.getvalue())
+    # return b_result
 
 
-def lwz_decompress(compressed: str) -> bytes:
+def lwz_decompress(compressed: str) -> str:
     """Decompress a list of output ks to a string."""
 
     # Build the dictionary.
@@ -44,12 +44,14 @@ def lwz_decompress(compressed: str) -> bytes:
     # dictionary = dict((i, chr(i)) for i in range(dict_size))
     dictionary = {i: (i,) for i in range(dict_size)}
 
+    # s_comp = StringIO(bytes_to_str(compressed))
     s_comp = StringIO(compressed)
 
-    result = BytesIO()
+    result = StringIO()
     tmp = s_comp.read(bit_len)
-    w = (int(tmp, 2), )
-
+    w = (int(tmp, 2),)
+    for x in w:
+        result.write()
     result.write(bytes(w))
     # result.write(w)
 
@@ -79,24 +81,46 @@ def lwz_decompress(compressed: str) -> bytes:
     return result.getvalue()
 
 
-def compare(uncompressed, compressed):
+def compare(uncompressed: bytes, compressed: str):
     orig_bits = len(uncompressed) * 8
-
     comp_bits = len(compressed)
     print("{} vs {}\nRate:{}".format(orig_bits, comp_bits, orig_bits / comp_bits))
 
 
-if __name__ == "__main__":
+def str_to_bytes(data: str) -> (bytes, int):
+    rem = (8 - len(data) % 8) % 8
+    if rem > 0:
+        data = "0" * rem + data
+    # for i in range(0, len(data), 8):
+    #     print(data[i:i + 8], int(data[i:i + 8], 2))
+    return bytes(int(data[i: i + 8], 2) for i in range(0, len(data), 8)), rem
+
+
+def bytes_to_str(data: bytes, rem: int = 0) -> str:
+    return "".join("{:08b}".format(x) for x in data)[rem:]
+
+
+def main():
     # How to use:
-    path = '1.bmp'
+    path = '1.bmp1'
     try:
         with open(path, 'rb') as file:
             init_data = file.read()
     except EnvironmentError:
         init_data = b'TOBEORNOTTOBEORTOBEORNOT'
 
+    # b_string = "101"
+    # b_bytes, rem = str_to_bytes(b_string)
+    # b_de_destring = bytes_to_str(b_bytes, rem)
+    # print("|", b_string, "|")
+    # print(b_bytes, rem)
+    # print(b_de_destring)
+    # print(b_string == b_de_destring)
+    # return
+
     time1 = time.time()
-    compressed_data = lzw_compress(init_data)
+    binary_data = bytes_to_str(init_data)
+    compressed_data = lzw_compress(binary_data)
     time2 = time.time()
     print('Compression function took %0.3f ms' % ((time2 - time1) * 1000.0))
     print(len(init_data), len(compressed_data))
@@ -109,3 +133,7 @@ if __name__ == "__main__":
 
     print(len(init_data), len(decompressed_data))
     print(init_data == decompressed_data)
+
+
+if __name__ == "__main__":
+    main()
