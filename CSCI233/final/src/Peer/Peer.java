@@ -145,4 +145,9 @@ class Peer {
         }
 
     }
+
+    void closeConnection() {
+        dOut.println("BYE");
+        dOut.flush();
+    }
 }

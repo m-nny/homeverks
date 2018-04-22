@@ -97,6 +97,7 @@ public class MainGUI extends JFrame implements ActionListener {
             }
             tf2.setText(jl.getSelectedValue().toString() + " downloaded or not");
         } else if (e.getSource() == close) { // If close button is pressed exit
+            peer.closeConnection();
             System.exit(0);
         }
 

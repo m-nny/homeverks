@@ -3,19 +3,14 @@ package FT;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
-import static java.lang.Math.round;
+import java.util.*;
 
 class FileTracker {
     static private String address;
     static private int port;
     static final private Queue<Socket> clientsQueue = new LinkedList<>();
     static final private List<FileModel> allFiles = new LinkedList<>();
-    static final HashMap<String, List<FileModel>> map = new HashMap<>();
+    static final HashMap<String, List<FileModel>> filesMap = new HashMap<>();
     private static final HashMap<String, Integer> requestsMap = new HashMap<>(), uploadsMap = new HashMap<>();
 
     static void init(String address, int port) {
@@ -65,9 +60,9 @@ class FileTracker {
             System.out.format("FT: new files came\n");
             allFiles.addAll(files);
             for (FileModel file : files) {
-                if (!map.containsKey(file.fileName))
-                    map.put(file.fileName, new LinkedList<>());
-                List<FileModel> list = map.get(file.fileName);
+                if (!filesMap.containsKey(file.fileName))
+                    filesMap.put(file.fileName, new LinkedList<>());
+                List<FileModel> list = filesMap.get(file.fileName);
                 list.add(file);
             }
         }
@@ -104,5 +99,13 @@ class FileTracker {
         System.out.println(address + ":" + uploadsMap.get(address) + "/" + requestsMap.get(address));
         System.out.println(String.format("%02d%%", 100 * uploads / request));
         return String.format("%02d%%", 100 * uploads / request);
+    }
+
+    static void cleanup(String address) {
+        for(Map.Entry<String, List<FileModel>> entry : filesMap.entrySet()) {
+            String key = entry.getKey();
+            List<FileModel> value = entry.getValue();
+            value.removeIf(file -> file.address.equals(address));
+        }
     }
 }

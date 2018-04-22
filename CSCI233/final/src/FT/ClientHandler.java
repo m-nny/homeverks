@@ -63,19 +63,21 @@ public class ClientHandler implements Runnable {
             while (true) {
                 inMessage = readMessage();
                 log("Client says:|" + inMessage + "|");
-                if (inMessage.trim().length() == 0 || "END".equals(inMessage))
+                if (inMessage == null || inMessage.length() == 0 || "END".equals(inMessage))
                     break;
                 if (inMessage.startsWith("SEARCH: ")) {
                     outMessage = search(inMessage.substring(8));
                 } else if (inMessage.startsWith("SCORE of ")) {
                     handlePoints(inMessage);
                     outMessage = null;
+                } else if (inMessage.equals("BYE")) {
+                    break;
                 } else {
                     outMessage = inMessage;
                 }
                 sendMessage(outMessage);
             }
-            closeConnection("Bye");
+            closeConnection("BYE");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -124,6 +126,7 @@ public class ClientHandler implements Runnable {
     }
 
     private void closeConnection(String message) throws IOException {
+        FileTracker.cleanup(clientSocket.getInetAddress().getHostAddress());
         sendMessage(message);
         log(message);
         this.clientSocket.close();
@@ -134,7 +137,7 @@ public class ClientHandler implements Runnable {
     }
 
     private String search(String filename) {
-        List<FileModel> list = FileTracker.map.get(filename);
+        List<FileModel> list = FileTracker.filesMap.get(filename);
         if (list == null || list.isEmpty())
             return "NOT FOUND";
         StringBuilder result = new StringBuilder("FOUND:");
