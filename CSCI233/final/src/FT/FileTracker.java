@@ -3,6 +3,7 @@ package FT;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -12,6 +13,7 @@ class FileTracker {
     static private int port;
     static final private Queue<Socket> clientsQueue = new LinkedList<>();
     static final private List<FileModel> allFiles = new LinkedList<>();
+    static final public HashMap<String, List<FileModel>> map = new HashMap<>();
 
     static void init(String address, int port) {
         FileTracker.address = address;
@@ -59,6 +61,12 @@ class FileTracker {
         synchronized (allFiles) {
             System.out.format("FT: new files came\n");
             allFiles.addAll(files);
+            for(FileModel file: files) {
+                if (!map.containsKey(file.fileName))
+                    map.put(file.fileName, new LinkedList<>());
+                List<FileModel> list = map.get(file.fileName);
+                list.add(file);
+            }
         }
     }
 

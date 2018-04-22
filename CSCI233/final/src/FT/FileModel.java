@@ -1,12 +1,12 @@
 package FT;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class FileModel {
-    private String fileName, fileType;
+    String fileName;
+    private String fileType;
     private int fileSize;
     private String lastModified;
     private String address;
@@ -18,11 +18,11 @@ public class FileModel {
         if (parsed.length != 6)
             throw new Exception("Illegal formatted string");
         this.fileName = parsed[0];
-        fileType = parsed[1];
-        fileSize = Integer.parseInt(parsed[2]);
-        lastModified = parsed[3];
-        address = parsed[4];
-        port = Integer.parseInt(parsed[5]);
+        this.fileType = parsed[1];
+        this.fileSize = Integer.parseInt(parsed[2]);
+        this.lastModified = parsed[3];
+        this.address = parsed[4];
+        this.port = Integer.parseInt(parsed[5]);
     }
 
     public FileModel(File file, String address, int port) {

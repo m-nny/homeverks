@@ -32,39 +32,45 @@ public class ClientHandler implements Runnable {
             dIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             dOut = new PrintWriter(clientSocket.getOutputStream());
 
-            String message = readMessage();
-            log("Client says:|" + message + "|");
-            if (!"HELLO".equals(message)) {
+            String inMessage, outMessage;
+            inMessage = readMessage();
+            log("Client says:|" + inMessage + "|");
+            if (!"HELLO".equals(inMessage)) {
                 closeConnection("Illegal format");
                 return;
             }
             sendMessage("HI");
             List<FileModel> files = new LinkedList<>();
             while (true) {
-                message = readMessage();
-                log("Client says:|" + message + "|");
-                if (message.trim().length() == 0 || "END".equals(message))
+                inMessage = readMessage();
+                log("Client says:|" + inMessage + "|");
+                if (inMessage.trim().length() == 0 || "END".equals(inMessage))
                     break;
                 try {
-                    files.add(new FileModel(message));
+                    files.add(new FileModel(inMessage));
                 } catch (Exception ex) {
                     System.out.println(ex.getMessage() + " Illegal format");
                     closeConnection("Illegal format");
                     return;
                 }
-                FileTracker.registerFiles(files);
             }
-            sendMessage("Done");
+//            sendMessage("Done");
             if (files.size() <= 0 || 5 < files.size()) {
                 closeConnection("Illegal number of files");
                 return;
             }
+            FileTracker.registerFiles(files);
             while (true) {
-                message = readMessage();
-                log("Client says:|" + message + "|");
-                if (message.trim().length() == 0 || "END".equals(message))
+                inMessage = readMessage();
+                log("Client says:|" + inMessage + "|");
+                if (inMessage.trim().length() == 0 || "END".equals(inMessage))
                     break;
-                sendMessage(message);
+                if (inMessage.startsWith("SEARCH: ")) {
+                    outMessage = search(inMessage.substring(8));
+                } else {
+                    outMessage = inMessage;
+                }
+                sendMessage(outMessage);
             }
             closeConnection("Bye");
         } catch (Exception e) {
@@ -104,5 +110,16 @@ public class ClientHandler implements Runnable {
 
     private void log(String message) {
         System.out.format("FT [%d]: %s\n", getClientID(), message);
+    }
+
+    private String search(String filename) {
+        List<FileModel> list = FileTracker.map.get(filename);
+        if (list == null || list.isEmpty())
+            return "NOT FOUND";
+        StringBuilder result = new StringBuilder("FOUND:");
+        for (FileModel file: list) {
+            result.append(file.toString());
+        }
+        return result.toString();
     }
 }

@@ -4,10 +4,11 @@ import FT.FileModel;
 
 import java.io.*;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class Peer {
     private Socket ftSocket;
@@ -50,5 +51,21 @@ class Peer {
         dOut.flush();
     }
 
+    List<String> search(String filename) throws IOException {
+        String inMessage, outMessage;
+        outMessage = "SEARCH: " + filename;
+        dOut.println(outMessage);
+        dOut.flush();
+        inMessage = dIn.readLine();
+        if (inMessage == null || inMessage.isEmpty() || "NOT FOUND".equals(inMessage))
+            return null;
+        List<String> list = new LinkedList<>();
+        Pattern pattern = Pattern.compile("<([^>]+)>");
+        Matcher matcher = pattern.matcher(inMessage);
+        while (matcher.find()) {
+            list.add(matcher.group(1));
+        }
+        return list;
+    }
 
 }

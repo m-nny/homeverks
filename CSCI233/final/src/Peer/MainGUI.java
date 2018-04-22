@@ -3,6 +3,7 @@ package Peer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -74,9 +75,18 @@ public class MainGUI extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == search) { // If search button is pressed show 25 randomly generated file info in text area
             String fileName = tf.getText();
-            Random r = new Random();
-            for (int i = 0; i < 25; i++) {
-                listModel.insertElementAt(fileName + " " + str[r.nextInt(str.length)], i);
+            List<String> result;
+            try {
+                result = peer.search(fileName);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                return;
+            }
+            listModel.clear();
+            if (result != null) {
+                for (String line : result) {
+                    listModel.addElement(line);
+                }
             }
         } else if (e.getSource() == dLoad) {   // If download button is pressed get the selected value from the list and show it in text field
             tf2.setText(jl.getSelectedValue().toString() + " downloaded");
