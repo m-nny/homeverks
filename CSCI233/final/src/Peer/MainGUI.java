@@ -2,6 +2,7 @@ package Peer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
@@ -89,6 +90,11 @@ public class MainGUI extends JFrame implements ActionListener {
                 }
             }
         } else if (e.getSource() == dLoad) {   // If download button is pressed get the selected value from the list and show it in text field
+            try {
+                peer.downloadFile(jl.getSelectedValue().toString());
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
             tf2.setText(jl.getSelectedValue().toString() + " downloaded");
         } else if (e.getSource() == close) { // If close button is pressed exit
             System.exit(0);
@@ -104,7 +110,6 @@ public class MainGUI extends JFrame implements ActionListener {
         Peer peer = new Peer(workingDir, PeerPort);
         peer.connect(FTAddress, FTPort);
         peer.registerOnFT();
-
 
         MainGUI ex = new MainGUI(peer);
         ex.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close the window if x button is pressed

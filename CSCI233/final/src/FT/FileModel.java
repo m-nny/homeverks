@@ -5,12 +5,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class FileModel {
-    String fileName;
-    private String fileType;
-    private int fileSize;
-    private String lastModified;
-    private String address;
-    private int port;
+    public String fileName;
+    public String fileType;
+    public int fileSize;
+    public String lastModified;
+    public String address;
+    public int port;
 
     public FileModel(String str) throws Exception {
         str = str.substring(1, str.length() - 1);
@@ -30,6 +30,7 @@ public class FileModel {
         int i = this.fileName.lastIndexOf('.');
         this.fileType = this.fileName.substring(i + 1);
         this.fileName = this.fileName.substring(0, i);
+        this.fileSize = (int) file.length();
         Date last = new Date(file.lastModified());
         this.lastModified = new SimpleDateFormat("dd/MM/yy").format(last);
         this.address = address;
