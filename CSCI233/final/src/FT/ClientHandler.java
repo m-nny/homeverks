@@ -67,6 +67,9 @@ public class ClientHandler implements Runnable {
                     break;
                 if (inMessage.startsWith("SEARCH: ")) {
                     outMessage = search(inMessage.substring(8));
+                } else if (inMessage.startsWith("SCORE of ")) {
+                    handlePoints(inMessage);
+                    outMessage = null;
                 } else {
                     outMessage = inMessage;
                 }
@@ -75,6 +78,20 @@ public class ClientHandler implements Runnable {
             closeConnection("Bye");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void handlePoints(String message) throws IOException {
+        message = message.substring(9);
+        int last = message.lastIndexOf(':');
+        String address = message.substring(0, last);
+        String n = message.substring(last + 2);
+        FileTracker.incNumberOfRequests(address);
+        if ("0".equals(n)) {
+        } else if ("1".equals(n)) {
+            FileTracker.incNumberOfUploads(address);
+        } else {
+            closeConnection("Illegal message");
         }
     }
 
@@ -100,11 +117,15 @@ public class ClientHandler implements Runnable {
     }
 
     private void sendMessage(String message) {
+        if (message == null)
+            return;
         dOut.print(message + "\r\n");
         dOut.flush();
     }
+
     private void closeConnection(String message) throws IOException {
         sendMessage(message);
+        log(message);
         this.clientSocket.close();
     }
 
@@ -117,8 +138,8 @@ public class ClientHandler implements Runnable {
         if (list == null || list.isEmpty())
             return "NOT FOUND";
         StringBuilder result = new StringBuilder("FOUND:");
-        for (FileModel file: list) {
-            result.append(file.toString());
+        for (FileModel file : list) {
+            result.append(file.toString()).append("|").append(FileTracker.getRate(file.address));
         }
         return result.toString();
     }

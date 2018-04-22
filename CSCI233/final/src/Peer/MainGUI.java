@@ -78,7 +78,7 @@ public class MainGUI extends JFrame implements ActionListener {
             String fileName = tf.getText();
             List<String> result;
             try {
-                result = peer.search(fileName);
+                result = peer.search(fileName.split("\\|")[0]);
             } catch (IOException e1) {
                 e1.printStackTrace();
                 return;
@@ -91,11 +91,11 @@ public class MainGUI extends JFrame implements ActionListener {
             }
         } else if (e.getSource() == dLoad) {   // If download button is pressed get the selected value from the list and show it in text field
             try {
-                peer.downloadFile(jl.getSelectedValue().toString());
+                peer.downloadFile(jl.getSelectedValue().toString().split("\\|")[0]);
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
-            tf2.setText(jl.getSelectedValue().toString() + " downloaded");
+            tf2.setText(jl.getSelectedValue().toString() + " downloaded or not");
         } else if (e.getSource() == close) { // If close button is pressed exit
             System.exit(0);
         }

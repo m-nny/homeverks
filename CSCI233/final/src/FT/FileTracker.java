@@ -8,12 +8,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import static java.lang.Math.round;
+
 class FileTracker {
     static private String address;
     static private int port;
     static final private Queue<Socket> clientsQueue = new LinkedList<>();
     static final private List<FileModel> allFiles = new LinkedList<>();
-    static final public HashMap<String, List<FileModel>> map = new HashMap<>();
+    static final HashMap<String, List<FileModel>> map = new HashMap<>();
+    private static final HashMap<String, Integer> requestsMap = new HashMap<>(), uploadsMap = new HashMap<>();
 
     static void init(String address, int port) {
         FileTracker.address = address;
@@ -61,7 +64,7 @@ class FileTracker {
         synchronized (allFiles) {
             System.out.format("FT: new files came\n");
             allFiles.addAll(files);
-            for(FileModel file: files) {
+            for (FileModel file : files) {
                 if (!map.containsKey(file.fileName))
                     map.put(file.fileName, new LinkedList<>());
                 List<FileModel> list = map.get(file.fileName);
@@ -70,4 +73,26 @@ class FileTracker {
         }
     }
 
+    static void incNumberOfRequests(String address) {
+        synchronized (requestsMap) {
+            requestsMap.put(address, requestsMap.getOrDefault(address, 0) + 1);
+        }
+    }
+
+    static void incNumberOfUploads(String address) {
+        synchronized (uploadsMap) {
+            uploadsMap.put(address, uploadsMap.getOrDefault(address, 0) + 1);
+        }
+    }
+
+    static String getRate(String address) {
+        int request, uploads;
+        synchronized (requestsMap) {
+            request = requestsMap.getOrDefault(address, 1);
+        }
+        synchronized (uploadsMap) {
+            uploads = uploadsMap.getOrDefault(address, 0);
+        }
+        return String.format("%02d%%", round(uploads / request * 100));
+    }
 }
