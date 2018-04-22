@@ -38,95 +38,95 @@ void set_string(char *origin, char **dest, int *len) {
     strcpy(*dest, origin);
 }
 
-client *create_client(int sock) {
-    client *c_client = all_clients + l_client;
-    c_client->id = l_client++;
-    c_client->g_id = -1;
-    free(c_client->name);
-    c_client->name = NULL;
-    c_client->n_len = 0;
-    c_client->point = 0;
-    c_client->sock = sock;
-    return c_client;
+client_p create_client(int sock) {
+    client_p client = all_clients + l_client;
+    client->id = l_client++;
+    client->g_id = -1;
+    free(client->name);
+    client->name = NULL;
+    client->n_len = 0;
+    client->point = 0;
+    client->sock = sock;
+    return client;
 }
 
-int destory_client(client *c_client) {
-    remove_member(c_client->g_id, c_client);
-    close(c_client->sock);
-    free(c_client->name);
-    c_client->name = NULL;
+int destroy_client(client_p client) {
+    remove_member(client->g_id, client);
+    close(client->sock);
+    free(client->name);
+    client->name = NULL;
     return 0;
 }
 
-q_group *create_group(int id, int dedicated_size) {
+group_p create_group(int id, int dedicated_size) {
     ///TO CHANGE
     id = l_group;
-    q_group *c_group = all_groups + (l_group++);
-    c_group->c_size = 0;
-    c_group->d_size = dedicated_size;
-    free(c_group->members);
-    c_group->members = calloc((size_t) dedicated_size, sizeof(client *));
-    c_group->id = l_group;
-    c_group->admin = NULL;
-    free(c_group->name);
-    c_group->name = NULL;
-    c_group->n_len = -1;
-    free(c_group->topic);
-    c_group->topic = NULL;
-    c_group->t_len = -1;
+    group_p group = all_groups + (l_group++);
+    group->c_size = 0;
+    group->d_size = dedicated_size;
+    free(group->members);
+    group->members = calloc((size_t) dedicated_size, sizeof(client_p));
+    group->id = l_group;
+    group->admin = NULL;
+    free(group->name);
+    group->name = NULL;
+    group->n_len = -1;
+    free(group->topic);
+    group->topic = NULL;
+    group->t_len = -1;
     pthread_mutex_init(g_mutex + id, NULL);
-    return c_group;
+    return group;
 }
 
 int destroy_group(int id) {
     if (id < 0 || id > MAX_GROUP_NUM)
         return 1;
-    q_group *c_group = all_groups + id;
+    group_p group = all_groups + id;
 
-    free(c_group->members);
-    c_group->members = NULL;
+    free(group->members);
+    group->members = NULL;
 
-    free(c_group->topic);
-    c_group->topic = NULL;
+    free(group->topic);
+    group->topic = NULL;
 
-    free(c_group->name);
-    c_group->name = NULL;
+    free(group->name);
+    group->name = NULL;
     pthread_mutex_destroy(g_mutex + id);
     return 0;
 }
 
-int add_member(int g_id, client *c_client) {
+int add_member(int g_id, client_p client) {
     if (g_id < 0 || g_id > MAX_GROUP_NUM)
         return 1;
-    q_group *c_group = all_groups + g_id;
-    if (c_group->d_size <= 0) {
+    group_p group = all_groups + g_id;
+    if (group->d_size <= 0) {
         return 1;
     }
-    if (c_group->c_size == c_group->d_size) {
+    if (group->c_size == group->d_size) {
         return 2;
     }
-    for (int i = 0; i < c_group->c_size; i++) {
-        if (c_group->members[i]->id == c_client->id) {
+    for (int i = 0; i < group->c_size; i++) {
+        if (group->members[i]->id == client->id) {
             return 3;
         }
     }
-    c_group->members[c_group->c_size] = c_client;
-    c_group->c_size++;
-    c_client->g_id = g_id;
+    group->members[group->c_size] = client;
+    group->c_size++;
+    client->g_id = g_id;
     return 0;
 }
 
-int remove_member(int g_id, client *c_client) {
+int remove_member(int g_id, client_p client) {
     if (g_id < 0 || g_id > MAX_GROUP_NUM)
         return 1;
-    q_group *c_group = all_groups + g_id;
-    if (c_group->d_size <= 0) {
+    group_p group = all_groups + g_id;
+    if (group->d_size <= 0) {
         return 1;
     }
-    for (int i = 0; i < c_group->c_size; i++) {
-        if (c_group->members[i]->id == c_client->id) {
-            c_group->members[i] = NULL;
-            c_group->c_size--;
+    for (int i = 0; i < group->c_size; i++) {
+        if (group->members[i]->id == client->id) {
+            group->members[i] = NULL;
+            group->c_size--;
             return 0;
         }
     }
@@ -138,11 +138,11 @@ int open_groups(char **p_str) {
     int offset = 0;
     offset = sprintf(str, "OPENGROUPS");
     for (int i = 1; i < l_group; i++) {
-        q_group *current_group = all_groups + i;
+        group_p group = all_groups + i;
         pthread_mutex_lock(g_mutex + i);
-        if (current_group->d_size > 0)
-            offset += sprintf(str + offset, "|%s|%s|%d|%d", current_group->topic, current_group->name,
-                              current_group->d_size, current_group->c_size);
+        if (group->d_size > 0)
+            offset += sprintf(str + offset, "|%s|%s|%d|%d", group->topic, group->name,
+                              group->d_size, group->c_size);
         pthread_mutex_unlock(g_mutex + i);
     }
     offset += sprintf(str + offset, "\r\n");
@@ -152,23 +152,23 @@ int open_groups(char **p_str) {
 
 int find_group(char *name) {
     for (int i = 1; i < l_group; i++) {
-        q_group *c_group = all_groups + i;
-        if (c_group->name != NULL && strcmp(name, c_group->name) == 0) {
+        group_p group = all_groups + i;
+        if (group->name != NULL && strcmp(name, group->name) == 0) {
             return i;
         }
     }
     return -1;
 }
 
-int read_quiz(client *c_client) {
-    q_group *c_group = all_groups + c_client->g_id;
+int read_quiz(client_p client) {
+    group_p group = all_groups + client->g_id;
     char *buffer = calloc(MAX_QUEST_NUM * MAX_QUEST_LEN + 10, sizeof(char));
     int b_len = MAX_QUEST_NUM * MAX_QUEST_LEN + 9;
     int offset = 0;
     int need_size = b_len;
     int cc;
     do {
-        cc = (int) read(c_client->sock, buffer + offset, (size_t) need_size);
+        cc = (int) read(client->sock, buffer + offset, (size_t) need_size);
         if (cc <= 0) {
             return -1;
         }
@@ -179,11 +179,11 @@ int read_quiz(client *c_client) {
 }
 
 void init() {
-    q_group *h_group = create_group(0, MAX_CLIENT_NUM);
+    group_p hub_group = create_group(0, MAX_CLIENT_NUM);
     pthread_create(all_threads + (l_thread++), NULL, hub, NULL);
 
     /// TESTING ONLY
-    q_group *test_group = create_group(1, 2);
+    group_p test_group = create_group(1, 2);
     test_group->topic = calloc(12, sizeof(char));
     strcpy(test_group->topic, "some_topic");
     test_group->name = calloc(12, sizeof(char));
@@ -191,95 +191,95 @@ void init() {
     /// TESTING ONLY
 }
 
-void handle_join(char **tokens, int cc, client *c_client) {
+void handle_join(char **tokens, int cc, client_p client) {
     if (cc != 3) {
-        write(c_client->sock, "BAD|Wrong format\r\n", 18);
+        write(client->sock, "BAD|Wrong format\r\n", 18);
         return;
     }
-    remove_member(0, c_client);
+    remove_member(0, client);
     int g_id = find_group(tokens[1]);
     if (g_id < 0) {
-        cc = (int) write(c_client->sock, "BAD|No such group\r\n", 19);
+        cc = (int) write(client->sock, "BAD|No such group\r\n", 19);
         if (cc <= 0) {
-            destroy_client(c_client);
+            destroy_client(client);
         }
         return;
     }
-    set_string(tokens[2], &(c_client->name), &(c_client->n_len));
-    int status = add_member(g_id, c_client);
+    set_string(tokens[2], &(client->name), &(client->n_len));
+    int status = add_member(g_id, client);
     switch (status) {
         case 0:
-            cc = (int) write(c_client->sock, "OK\r\n", 4);
+            cc = (int) write(client->sock, "OK\r\n", 4);
             break;
         case 1:
-            cc = (int) write(c_client->sock, "BAD|Group is full\r\n", 19);
+            cc = (int) write(client->sock, "BAD|Group is full\r\n", 19);
             break;
         case 2:
-            cc = (int) write(c_client->sock, "BAD|Already there\r\n", 19);
+            cc = (int) write(client->sock, "BAD|Already there\r\n", 19);
             break;
         default:
             break;
     }
     if (cc <= 0) {
-        destroy_client(c_client);
+        destroy_client(client);
     }
 }
 
-void handle_group(char **tokens, int cc, client *c_client) {
+void handle_group(char **tokens, int cc, client_p client) {
     if (cc != 4) {
-        cc = (int) write(c_client->sock, "BAD|Wrong format\r\n", 18);
+        cc = (int) write(client->sock, "BAD|Wrong format\r\n", 18);
         if (cc <= 0) {
-            destroy_client(c_client);
+            destroy_client(client);
         }
         return;
     }
     char *e_ptr;
     int g_size = (int) strtol(tokens[3], &e_ptr, 10);
     if (tokens[3] == e_ptr) {
-        cc = (int) write(c_client->sock, "BAD|Wrong format\r\n", 18);
+        cc = (int) write(client->sock, "BAD|Wrong format\r\n", 18);
         if (cc <= 0) {
-            destroy_client(c_client);
+            destroy_client(client);
         }
         return;
     }
-    q_group *c_group = create_group(-1, g_size);
+    group_p c_group = create_group(-1, g_size);
     set_string(tokens[1], &(c_group->topic), &(c_group->t_len));
     set_string(tokens[2], &(c_group->name), &(c_group->n_len));
 
-    cc = (int) write(c_client->sock, "SENDQUIZ\r\n", 10);
+    cc = (int) write(client->sock, "SENDQUIZ\r\n", 10);
     if (cc <= 0) {
-        destroy_client(c_client);
+        destroy_client(client);
     }
     return;
     ///TODO
-    cc = read_quiz(c_client);
+    cc = read_quiz(client);
     if (cc == -2) {
-        cc = (int) write(c_client->sock, "BAD|Wrong format\r\n", 18);
+        cc = (int) write(client->sock, "BAD|Wrong format\r\n", 18);
         if (cc <= 0) {
-            destroy_client(c_client);
+            destroy_client(client);
         }
         return;
     }
     if (cc <= 0) {
-        destroy_client(c_client);
+        destroy_client(client);
     }
 
     pthread_mutex_lock(g_mutex);
-    remove_member(0, c_client);
+    remove_member(0, client);
     pthread_mutex_unlock(g_mutex);
-    c_group->admin = c_client;
-    c_client->g_id = c_group->id;
+    c_group->admin = client;
+    client->g_id = c_group->id;
 }
 
-void handle_free_client(char *msg, int cc, client *c_client) {
+void handle_free_client(char *msg, int cc, client_p client) {
     cc = normalize(msg, cc);
-    printf("%d says:|%s|\n", c_client->sock, msg);
+    printf("%d says:|%s|\n", client->sock, msg);
     if (strcmp(msg, "GETOPENGROUPS") == 0) {
         char *out_msg = NULL;
         cc = open_groups(&out_msg);
-        cc = (int) write(c_client->sock, out_msg, (size_t) cc);
+        cc = (int) write(client->sock, out_msg, (size_t) cc);
         if (cc <= 0) {
-            destory_client(c_client);
+            destroy_client(client);
         }
         return;
     }
@@ -287,40 +287,40 @@ void handle_free_client(char *msg, int cc, client *c_client) {
     cc = parse_args(msg, tokens);
     if (strcmp(tokens[0], "JOIN") == 0) {
         if (cc != 3) {
-            write(c_client->sock, "BAD|Wrong format\r\n", 18);
+            write(client->sock, "BAD|Wrong format\r\n", 18);
             return;
         }
-        remove_member(0, c_client);
+        remove_member(0, client);
         int g_id = find_group(tokens[1]);
         if (g_id < 0) {
-            cc = (int) write(c_client->sock, "BAD|No such group\r\n", 19);
+            cc = (int) write(client->sock, "BAD|No such group\r\n", 19);
             if (cc <= 0) {
-                destory_client(c_client);
+                destroy_client(client);
             }
             return;
         }
-        c_client->n_len = (int) strlen(tokens[2]);
-        c_client->name = calloc(strlen(tokens[2]) + 1, sizeof(char));
-        strcpy(c_client->name, tokens[2]);
-        int status = add_member(g_id, c_client);
+        client->n_len = (int) strlen(tokens[2]);
+        client->name = calloc(strlen(tokens[2]) + 1, sizeof(char));
+        strcpy(client->name, tokens[2]);
+        int status = add_member(g_id, client);
         if (status == 0) {
-            cc = (int) write(c_client->sock, "OK\r\n", 4);
+            cc = (int) write(client->sock, "OK\r\n", 4);
             if (cc <= 0) {
-                destory_client(c_client);
+                destroy_client(client);
             }
             return;
         }
         if (status == 2) {
-            cc = (int) write(c_client->sock, "BAD|Group is full\r\n", 19);
+            cc = (int) write(client->sock, "BAD|Group is full\r\n", 19);
             if (cc <= 0) {
-                destory_client(c_client);
+                destroy_client(client);
             }
             return;
         }
         if (status == 3) {
-            cc = (int) write(c_client->sock, "BAD|Already there\r\n", 19);
+            cc = (int) write(client->sock, "BAD|Already there\r\n", 19);
             if (cc <= 0) {
-                destory_client(c_client);
+                destroy_client(client);
             }
             return;
         }
@@ -332,9 +332,9 @@ void *new_client(void *args) {
     int sock = (int) args;
     printf("new thread here, %d has come!\n", sock);
     fflush(stdout);
-    client *c_client = create_client(sock);
-    if (c_client == NULL) {
-        printf("Couldn't create a client for %d\n", sock);
+    client_p client = create_client(sock);
+    if (client == NULL) {
+        printf("Couldn't create a client_t for %d\n", sock);
         pthread_exit(NULL);
     }
     char *msg_to_send = NULL;
@@ -346,7 +346,7 @@ void *new_client(void *args) {
         pthread_exit(NULL);
     }
     pthread_mutex_lock(g_mutex);
-    int status = add_member(0, c_client);
+    int status = add_member(0, client);
     pthread_mutex_unlock(g_mutex);
     if (status == 0) {
         printf("Client %d joined hub\n", sock);
@@ -366,7 +366,7 @@ void *new_client(void *args) {
 }
 
 void *hub(void *args) {
-    q_group *c_group = all_groups;
+    group_p group = all_groups;
     fd_set set;
     struct timeval timeout;
     int mx, cc;
@@ -379,8 +379,8 @@ void *hub(void *args) {
         timeout.tv_sec = 3;
         timeout.tv_usec = 0;
         mx = 0;
-        for (int i = 0; i < c_group->c_size; i++) {
-            client *c_client = c_group->members[i];
+        for (int i = 0; i < group->c_size; i++) {
+            client_p c_client = group->members[i];
             FD_SET(c_client->sock, &set);
             if (c_client->sock > mx)
                 mx = c_client->sock;
@@ -391,12 +391,12 @@ void *hub(void *args) {
         select(mx + 1, &set, NULL, NULL, &timeout);
 
         pthread_mutex_lock(g_mutex);
-        for (int i = 0; i < c_group->c_size; i++) {
-            client *c_client = c_group->members[i];
+        for (int i = 0; i < group->c_size; i++) {
+            client_p c_client = group->members[i];
             if (FD_ISSET(c_client->sock, &set)) {
                 cc = (int) read(c_client->sock, buffer, MAX_BUFFER_SIZE);
                 if (cc <= 0) {
-                    destory_client(c_client);
+                    destroy_client(c_client);
                     continue;
                 }
                 handle_free_client(buffer, cc, c_client);
@@ -450,13 +450,13 @@ int main(int argc, char *argv[]) {
         int ssock;
 
         alen = sizeof(fsin);
-        ssock = accept(msock, (struct sockaddr *) &fsin, (socklen_t *) &alen);
+        ssock = accept(msock, (struct sockaddr *) &fsin, (socklen_t *) & alen);
         if (ssock < 0) {
             fprintf(stderr, "accept: %s\n", strerror(errno));
             exit(-1);
         }
 
-        printf("A client has arrived for echoes.\n");
+        printf("A client_t has arrived for echoes.\n");
         fflush(stdout);
         pthread_t temp_pthread;
         pthread_create(&temp_pthread, NULL, new_client, (void *) ssock);

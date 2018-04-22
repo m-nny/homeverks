@@ -16,14 +16,14 @@
 #define SEPARATOR "|"
 #define QLEN 5
 
-struct question {
+struct question_struct {
     char *str;
     int q_len;
     char *ans;
     int a_len;
 };
 
-struct client {
+struct client_struct {
     int id;
     int sock;
     char *name;
@@ -32,7 +32,7 @@ struct client {
     int g_id;
 };
 
-struct q_group {
+struct group_struct {
     char *topic;
     int t_len;
     int id;
@@ -40,17 +40,21 @@ struct q_group {
     int n_len;
     int c_size;
     int d_size;
-    struct client *admin;
-    struct client **members; // array for the members of the group
+    struct client_struct *admin;
+    struct client_struct **members; // array for the members of the group
 };
 
-typedef struct question question;
-typedef struct client client;
-typedef struct q_group q_group;
+typedef struct question_struct question_t;
+typedef struct client_struct client_t;
+typedef struct group_struct group_t;
+
+typedef struct question_struct *question_p;
+typedef struct client_struct *client_p;
+typedef struct group_struct *group_p;
 
 // 0 is for the "hub".
 // NULL, if there is no such
-q_group all_groups[33];
+group_t all_groups[33];
 int l_group = 0;
 
 // Mutex for the each group, so object can be safely used
@@ -59,7 +63,7 @@ pthread_t all_threads[33];
 int l_thread = 0;
 
 // there will be at most 1020 clients
-client all_clients[1024];
+client_t all_clients[1024];
 int l_client = 0;
 
 // In order to normalize string = remove trailing \r\n
@@ -69,17 +73,17 @@ int normalize(char *str, int len);
 int parse_args(char *str, char **args);
 
 // Sort members by their points
-void sort_members(q_group *q_group);
+void sort_members(group_p q_group);
 
 // reads message from client terminated with CRLF
 // returns status of read
 // 0 - ok
 // 1 - error, occured
-int read_msg_cr(client *cl, char *str);
+int read_msg_cr(client_p cl, char *str);
 
 // reads message from client with given size in the message
 // returns status of read
-int read_msg_size(client *cl, char *str);
+int read_msg_size(client_p cl, char *str);
 
 int find_group(char *group_name);
 
@@ -89,18 +93,20 @@ int open_groups(char **str);
 // returns status of the operation:
 // 0 - ok
 // add: 1 - no such group, 2 - full group, 3 - already there
-// remove: 1 - no such group, 2 - no such client
-int add_member(int g_id, client *c_client);
-int remove_member(int g_id, client *c_client);
+// remove: 1 - no such group, 2 - no such client_t
+int add_member(int g_id, client_p client);
 
-// Only creates client object
-client *create_client(int sock);
+int remove_member(int g_id, client_p client);
 
-q_group *create_group(int id, int dedicated_size);
+// Only creates client_t object
+client_p create_client(int sock);
+int destroy_client(client_p client);
+
+group_p create_group(int id, int dedicated_size);
 int destroy_group(int id);
 
 // Close connection, remove from groups, and all lists
-void close_connection(client *cl);
+void close_connection(client_p cl);
 
 // Hub function
 void *hub(void *args);

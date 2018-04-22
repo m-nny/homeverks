@@ -6,23 +6,23 @@ _This homework takes the quiz server and enhances it.  Some of these enhancement
 
 The new fancy server can manage multiple on-going groups taking different quizzes.  In this version, the group admin/creator starts a group and uploads the quiz questions, so the creator is never one of the competitors in its own quiz group.
 
-Whenever a new client accesses the server, the server sends a message about the groups currently awaiting members: `OPENGROUPS`, followed by the list of groups, each consisting of the topic, the group name, the desired group size, and the current size (number of people who have joined so far).  This message is terminated by a `CRLF`.  At any time a client is not involved in taking a quiz, the client may request the current list of open groups, by sending the message `GETOPENGROUPS`.  `ENDGROUP` is used when a group has ended, to inform the quiz takers that their quiz is over.
+Whenever a new client_struct accesses the server, the server sends a message about the groups currently awaiting members: `OPENGROUPS`, followed by the list of groups, each consisting of the topic, the group name, the desired group size, and the current size (number of people who have joined so far).  This message is terminated by a `CRLF`.  At any time a client_struct is not involved in taking a quiz, the client_struct may request the current list of open groups, by sending the message `GETOPENGROUPS`.  `ENDGROUP` is used when a group has ended, to inform the quiz takers that their quiz is over.
 
 | **Server sends:**                     | **Client answers:**   | **Notes**                                                                         |
 | ------------------------------------- | -------------------   | ------------------------------------------------------------------------------    |
 | OPENGROUPS&#124;topic&#124;name&#124;size&#124;curr... | _nothing_ | The group information repeats for all open groups                            |
-| WAIT                                  | _nothing_             | _Optional command – client may ignore_                                            |
+| WAIT                                  | _nothing_             | _Optional command – client_struct may ignore_                                            |
 | ENDGROUP&#124;groupname               | _nothing_             | _Group is ended naturally or unnaturally, but waiting clients are not dropped_    |
 
-The client may start a new group, or join an existing group, one or the other, not both.  To create a group, the client sends the `GROUP` command, which contains the quiz topic, the group name, and the user's name.  The server will respond with `SENDQUIZ`, which invites the client to send the quiz file as a stream of questions in exactly the same format as in the previous homework.  The client `QUIZ` message is the type of message where the size precedes the data, and the `CRLF` terminator is not used.  This is so the server can read the data in a loop.  The server may answer `BAD` if the group name is already in use (or any other error occurs).
+The client_struct may start a new group, or join an existing group, one or the other, not both.  To create a group, the client_struct sends the `GROUP` command, which contains the quiz topic, the group name, and the user's name.  The server will respond with `SENDQUIZ`, which invites the client_struct to send the quiz file as a stream of questions in exactly the same format as in the previous homework.  The client_struct `QUIZ` message is the type of message where the size precedes the data, and the `CRLF` terminator is not used.  This is so the server can read the data in a loop.  The server may answer `BAD` if the group name is already in use (or any other error occurs).
 
 `BAD` messages are always followed by an error description and terminated by `CRLF`. For example:
 ```
     BAD|The group name is not uniqueCRLF
 ```
-The client may join an existing group with the `JOIN` message by supplying the group name and the user name.  The server responds `OK` or `BAD` (with some message).
+The client_struct may join an existing group with the `JOIN` message by supplying the group name and the user name.  The server responds `OK` or `BAD` (with some message).
 
-The client may `LEAVE` a group before or during a quiz.  After leaving their current group cleanly, the client may join another group, or create one.
+The client_struct may `LEAVE` a group before or during a quiz.  After leaving their current group cleanly, the client_struct may join another group, or create one.
 
 A group creator may cancel a group, only if the quiz has not started yet.  If the quiz has started, it will continue, and the creator can exit the program and it will still continue, but the creator cannot cancel it.  The `LEAVE` command is not allowed for the group creator.
 
@@ -30,7 +30,7 @@ There are a maximum of 32 groups allowed at one time.
 
 | **Client sends:**                  | **Server answers**  | **Notes**                                                                          |
 | ---------------------------------- | ------------------- | ---------------------------------------------------------------------------------- |
-| GROUP&#124;topic&#124;groupname&#124;groupsize | `SENDQUIZ` or `BAD` | After server responds with `SENDQUIZ`, the client can send the quiz message        |
+| GROUP&#124;topic&#124;groupname&#124;groupsize | `SENDQUIZ` or `BAD` | After server responds with `SENDQUIZ`, the client_struct can send the quiz message        |
 | QUIZ&#124;quizsize&#124;quiztext           | `OK` or `BAD`       | This message is not terminated with `CRLF` – the size gives the needed information |
 | CANCEL&#124;groupname                  | `OK` or `BAD`       | Server closes the group                                                            |
 | JOIN&#124;groupname&#124;username        | `OK` or `BAD`       |                                                                                    |
@@ -41,11 +41,11 @@ The quiz scoring is the same. For each question, the first person to answer the 
 
 The group creator is sent each question but is not allowed to answer.  The creator is also sent the message about each question's winner, and about the results.  When a quiz is completed, the clients return to being able to create a group or join a group.
 
-The protocol for sending questions and announcing a winner is unchanged.  As long as at least one client remains in the group, keep asking questions, until all questions are exhausted.  When they are all finished, announce the winner (and standings of all players).
+The protocol for sending questions and announcing a winner is unchanged.  As long as at least one client_struct remains in the group, keep asking questions, until all questions are exhausted.  When they are all finished, announce the winner (and standings of all players).
 
-The server sends the size of the entire question plus answers string, and then the string.  A terminating `CRLF` is not used or required because the size precedes the message, and the message contains newlines within it.  If the client does not know the answer it sends the special text `NOANS` in place of the answer ID.
+The server sends the size of the entire question plus answers string, and then the string.  A terminating `CRLF` is not used or required because the size precedes the message, and the message contains newlines within it.  If the client_struct does not know the answer it sends the special text `NOANS` in place of the answer ID.
 
-After all the users have answered, the server sends the client the winner's name (the name of the client who scored 2 for the fastest right answer).  If no one answered correctly, the winner's name sent will be the empty string `""`.
+After all the users have answered, the server sends the client_struct the winner's name (the name of the client_struct who scored 2 for the fastest right answer).  If no one answered correctly, the winner's name sent will be the empty string `""`.
 
 | **Server sends:**              | **Client answers:** |
 | ------------------------------ | ------------------- |
@@ -60,7 +60,7 @@ After all the questions are finished, the server sends the quiz standings as a s
 
 The quiz file format is the same as before.  A question may consist of multiple lines, up to a total of 2048 characters.  It is separated from the correct answer by a blank line, and the next question follows the correct answer with another blank line in between.  Allow for a maximum of 128 questions.
 
-Your server **must** employ some combination of multiplexing and threaded behavior, which you should choose yourself.  For the multiplexing you may use `select` (as we covered in class) or `poll`, but no other technique, for consistency.  Your main thread must never block, and should not perform any long-lasting operations.  No client should ever be rejected.
+Your server **must** employ some combination of multiplexing and threaded behavior, which you should choose yourself.  For the multiplexing you may use `select` (as we covered in class) or `poll`, but no other technique, for consistency.  Your main thread must never block, and should not perform any long-lasting operations.  No client_struct should ever be rejected.
 
 
 #### Submission Process and Grading
