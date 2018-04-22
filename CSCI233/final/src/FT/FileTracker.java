@@ -13,7 +13,7 @@ class FileTracker {
     static final private Queue<Socket> clientsQueue = new LinkedList<>();
     static final private List<FileModel> allFiles = new LinkedList<>();
 
-    FileTracker(String address, int port) {
+    static void init(String address, int port) {
         FileTracker.address = address;
         FileTracker.port = port;
     }

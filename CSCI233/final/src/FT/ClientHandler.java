@@ -1,8 +1,6 @@
 package FT;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,8 +9,8 @@ public class ClientHandler implements Runnable {
     private Socket clientSocket;
     private static Integer lastClientID = 0;
     private int clientID = -1;
-    private DataInputStream dIn;
-    private DataOutputStream dOut;
+    private BufferedReader dIn;
+    private PrintWriter dOut;
 
     ClientHandler(Socket client) {
         this.clientSocket = client;
@@ -31,37 +29,42 @@ public class ClientHandler implements Runnable {
     public void run() {
         try {
             log("Listening client");
-            dIn = new DataInputStream(clientSocket.getInputStream());
-            dOut = new DataOutputStream(clientSocket.getOutputStream());
+            dIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            dOut = new PrintWriter(clientSocket.getOutputStream());
 
-            String message = dIn.readLine();
+            String message = readMessage();
             log("Client says:|" + message + "|");
             if (!"HELLO".equals(message)) {
                 closeConnection("Illegal format");
                 return;
             }
-            dOut.writeChars("HI");
-            dOut.flush();
+            sendMessage("HI");
             List<FileModel> files = new LinkedList<>();
             while (true) {
-                message = dIn.readLine();
+                message = readMessage();
                 log("Client says:|" + message + "|");
-                if (message.isEmpty() || "END".equals(message))
+                if (message.trim().length() == 0 || "END".equals(message))
                     break;
-                files.add(new FileModel(message));
+                try {
+                    files.add(new FileModel(message));
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage() + " Illegal format");
+                    closeConnection("Illegal format");
+                    return;
+                }
                 FileTracker.registerFiles(files);
             }
-            if (files.size() <= 0|| 5 < files.size()) {
+            sendMessage("Done");
+            if (files.size() <= 0 || 5 < files.size()) {
                 closeConnection("Illegal number of files");
                 return;
             }
             while (true) {
-                message = dIn.readLine();
+                message = readMessage();
                 log("Client says:|" + message + "|");
-                if (message.isEmpty())
+                if (message.trim().length() == 0 || "END".equals(message))
                     break;
-                dOut.writeChars(message);
-                dOut.flush();
+                sendMessage(message);
             }
             closeConnection("Bye");
         } catch (Exception e) {
@@ -69,8 +72,33 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    private String readMessage() throws IOException {
+        String msg = dIn.readLine();
+        if (msg == null)
+            return null;
+        StringBuilder message = new StringBuilder(msg);
+        int cc = message.length();
+        if (cc > 0 && message.charAt(cc - 1) == '\r') {
+            message.setLength(cc - 1);
+            cc--;
+        }
+        if (cc > 0 && message.charAt(cc - 1) == '\n') {
+            message.setLength(cc - 1);
+            cc--;
+        }
+        if (cc > 0 && message.charAt(cc - 1) == '\r') {
+            message.setLength(cc - 1);
+            cc--;
+        }
+        return message.toString();
+    }
+
+    private void sendMessage(String message) {
+        dOut.print(message + "\r\n");
+        dOut.flush();
+    }
     private void closeConnection(String message) throws IOException {
-        dOut.writeChars(message);
+        sendMessage(message);
         this.clientSocket.close();
     }
 

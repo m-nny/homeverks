@@ -2,21 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c822618f-03c9-47ce-9943-98743c411b5a" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/description.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/final.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/project-template.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/final.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/FT/ClientHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/FT/FileModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/FT/FileTracker.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/FT/Main.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/task.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Peer/MainGUI.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Peer/Peer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/FT/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FT/ClientHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/FT/FileModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FT/FileModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/FT/FileTracker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FT/FileTracker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/FT/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FT/Main.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -27,44 +19,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/FT/Main.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="7" column="19" selection-start-line="7" selection-start-column="19" selection-end-line="7" selection-end-column="19" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FileTracker.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/FT/FileTracker.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="282">
-              <caret line="57" column="10" selection-start-line="57" selection-start-column="10" selection-end-line="57" selection-end-column="10" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ClientHandler.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/FT/ClientHandler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="76" column="38" lean-forward="true" selection-start-line="76" selection-start-column="38" selection-end-line="76" selection-end-column="38" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#279#280#0" expanded="true" />
-                <element signature="e#321#322#0" expanded="true" />
-                <element signature="e#2331#2332#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -78,6 +33,14 @@
       <find>format</find>
       <find>wai</find>
       <find>waiti</find>
+      <find>d</find>
+      <find>writechars</find>
+      <find>print(</find>
+      <find>flush</find>
+      <find>for input</find>
+      <find>input string</find>
+      <find>for in</find>
+      <find>println</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -86,11 +49,15 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/FT/Main.java" />
         <option value="$PROJECT_DIR$/src/FT/DealWithClient.java" />
-        <option value="$PROJECT_DIR$/src/FT/FileModel.java" />
-        <option value="$PROJECT_DIR$/src/FT/ClientHandler.java" />
+        <option value="$PROJECT_DIR$/src/Peer/Main.java" />
         <option value="$PROJECT_DIR$/src/FT/FileTracker.java" />
+        <option value="$PROJECT_DIR$/src/FT/Main.java" />
+        <option value="$PROJECT_DIR$/src/Peer/MainGUI.java" />
+        <option value="$PROJECT_DIR$/src/FT/ClientHandler.java" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.java" />
+        <option value="$PROJECT_DIR$/src/Peer/Peer.java" />
+        <option value="$PROJECT_DIR$/src/FT/FileModel.java" />
       </list>
     </option>
   </component>
@@ -122,6 +89,17 @@
             <path>
               <item name="final" type="b2602c69:ProjectViewProjectNode" />
               <item name="final" type="462c0819:PsiDirectoryNode" />
+              <item name="__test__" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="final" type="b2602c69:ProjectViewProjectNode" />
+              <item name="final" type="462c0819:PsiDirectoryNode" />
+              <item name="__test__" type="462c0819:PsiDirectoryNode" />
+              <item name="SHARE1" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="final" type="b2602c69:ProjectViewProjectNode" />
+              <item name="final" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -129,6 +107,12 @@
               <item name="final" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="FT" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="final" type="b2602c69:ProjectViewProjectNode" />
+              <item name="final" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="Peer" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -139,6 +123,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$2/Languages" value="JAVA" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -152,13 +137,25 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.Peer GUI">
     <configuration name="FileTracker" type="Application" factoryName="Application" singleton="true" temporary="true">
       <option name="MAIN_CLASS_NAME" value="FT.Main" />
       <module name="final" />
+      <option name="PROGRAM_PARAMETERS" value="localhost 3387" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="FT.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+    </configuration>
+    <configuration name="Peer GUI" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="Peer.MainGUI" />
+      <module name="final" />
+      <option name="PROGRAM_PARAMETERS" value="__test__/SHARE1 localhost 3387 3333" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Peer.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -178,8 +175,13 @@
       <envs />
       <method />
     </configuration>
+    <list>
+      <item itemvalue="Application.FileTracker" />
+      <item itemvalue="Application.Peer GUI" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Peer GUI" />
         <item itemvalue="Application.FileTracker" />
       </list>
     </recent_temporary>
@@ -191,16 +193,15 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1524347337469</updated>
-      <workItem from="1524347339529" duration="4488000" />
+      <workItem from="1524347339529" duration="11018000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4488000" />
+    <option name="totallyTimeSpent" value="11018000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="265" y="22" width="1175" height="878" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -209,20 +210,20 @@
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" />
       <window_info anchor="bottom" id="Database Changes" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.329602" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.329602" />
       <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Terminal" />
       <window_info id="Designer" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24936171" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.19489361" />
       <window_info anchor="right" id="Database" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.329602" />
       <window_info id="Learn" />
       <window_info anchor="right" id="SciView" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Debug" order="3" visible="true" weight="0.39925373" />
       <window_info id="Favorites" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -235,6 +236,11 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="4" />
+    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/Main.java">
@@ -258,24 +264,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/FT/Main.java">
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-9.0.4.jdk/Contents/Home/lib/src.zip!/jdk.jshell/jdk/jshell/execution/Util.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="19" selection-start-line="7" selection-start-column="19" selection-end-line="7" selection-end-column="19" />
+        <state relative-caret-position="224">
+          <caret line="57" column="13" selection-start-line="57" selection-start-column="13" selection-end-line="57" selection-end-column="13" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/FT/FileModel.java">
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-9.0.4.jdk/Contents/Home/lib/src.zip!/java.base/java/lang/Thread.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="22" column="13" lean-forward="true" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
+        <state relative-caret-position="171">
+          <caret line="843" selection-start-line="843" selection-end-line="843" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/FT/FileTracker.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="282">
-          <caret line="57" column="10" selection-start-line="57" selection-start-column="10" selection-end-line="57" selection-end-column="10" />
+        <state relative-caret-position="183">
+          <caret line="36" column="33" lean-forward="true" selection-start-line="36" selection-start-column="33" selection-end-line="36" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -284,13 +290,56 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/FT/ClientHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="76" column="38" lean-forward="true" selection-start-line="76" selection-start-column="38" selection-end-line="76" selection-end-column="38" />
+        <state relative-caret-position="20">
+          <caret line="38" column="23" lean-forward="true" selection-start-line="38" selection-start-column="23" selection-end-line="38" selection-end-column="23" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#279#280#0" expanded="true" />
-            <element signature="e#321#322#0" expanded="true" />
-            <element signature="e#2331#2332#0" expanded="true" />
+            <element signature="e#3056#3057#0" expanded="true" />
+            <element signature="e#3130#3131#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Peer/MainGUI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="229">
+          <caret line="88" column="33" selection-start-line="88" selection-start-column="33" selection-end-line="88" selection-end-column="33" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/FT/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/FT/FileModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="56" column="51" lean-forward="true" selection-start-line="56" selection-start-column="51" selection-end-line="56" selection-end-column="51" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="1" lean-forward="true" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Peer/Peer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="211">
+          <caret line="45" column="35" selection-start-line="45" selection-start-column="35" selection-end-line="45" selection-end-column="35" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
