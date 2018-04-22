@@ -14,6 +14,8 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import static java.lang.System.exit;
+
 
 public class MainGUI extends JFrame implements ActionListener {
     private JButton search;  //Buttons
@@ -84,21 +86,28 @@ public class MainGUI extends JFrame implements ActionListener {
                 return;
             }
             listModel.clear();
-            if (result != null) {
+            if (result == null || result.size() <= 0) {
+                tf2.setText("File not found");
+            } else {
                 for (String line : result) {
                     listModel.addElement(line);
                 }
             }
         } else if (e.getSource() == dLoad) {   // If download button is pressed get the selected value from the list and show it in text field
+            boolean status = false;
             try {
-                peer.downloadFile(jl.getSelectedValue().toString().split("\\|")[0]);
+                status = peer.downloadFile(jl.getSelectedValue().toString().split("\\|")[0]);
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
-            tf2.setText(jl.getSelectedValue().toString() + " downloaded or not");
+            if (status) {
+                tf2.setText("Downloaded completed");
+            } else {
+                tf2.setText("Downloaded failed");
+            }
         } else if (e.getSource() == close) { // If close button is pressed exit
             peer.closeConnection();
-            System.exit(0);
+            exit(0);
         }
 
     }
@@ -110,7 +119,10 @@ public class MainGUI extends JFrame implements ActionListener {
         int PeerPort = Integer.parseInt(args[3]);
         Peer peer = new Peer(workingDir, PeerPort);
         peer.connect(FTAddress, FTPort);
-        peer.registerOnFT();
+        if (!peer.registerOnFT()) {
+            System.out.println("Couldn't connect to server");
+            exit(1);
+        }
 
         MainGUI ex = new MainGUI(peer);
         ex.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close the window if x button is pressed

@@ -3,9 +3,8 @@ package Peer;
 import FT.FileModel;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -33,24 +32,31 @@ class Peer {
         System.out.println("Client connect to server");
     }
 
-    void registerOnFT() throws Exception {
+    boolean registerOnFT() throws Exception {
         String inMessage, outMessage;
 
         dOut.println("HELLO");
         dOut.flush();
         inMessage = dIn.readLine();
         System.out.println("FT says: |" + inMessage + "|");
+        if (!inMessage.equals("HI")) {
+            System.out.println("Server responded badly");
+            return false;
+        }
 
         File[] fileNames = folder.listFiles();
         if (fileNames == null) {
             throw new Exception("There are no such directory");
         }
         for (File file : fileNames) {
-            outMessage = new FileModel(file, InetAddress.getLocalHost().getHostAddress(), peerPort).toString();
+            outMessage = new FileModel(file, getHostAddress(), peerPort).toString();
             dOut.println(outMessage);
         }
         dOut.println("END");
         dOut.flush();
+
+        inMessage = dIn.readLine();
+        return inMessage.equals("DONE");
     }
 
     List<String> search(String filename) throws IOException {
@@ -71,7 +77,7 @@ class Peer {
         return list;
     }
 
-    void downloadFile(String string) throws Exception {
+    boolean downloadFile(String string) throws Exception {
 
         FileModel fm = new FileModel(string);
         Socket sock = new Socket(fm.address, fm.port);
@@ -99,7 +105,7 @@ class Peer {
         System.out.println("SCORE of " + sock.getInetAddress().getHostAddress() + ": " + done);
         dOut.println("SCORE of " + sock.getInetAddress().getHostAddress() + ": " + done);
         dOut.flush();
-
+        return done == 1;
     }
 
     private void uploadFile(Socket sock) throws IOException {
@@ -149,5 +155,21 @@ class Peer {
     void closeConnection() {
         dOut.println("BYE");
         dOut.flush();
+    }
+
+    private String getHostAddress() {
+        try {
+            for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+                if (!ni.isLoopback() && ni.isUp() && ni.getHardwareAddress() != null) {
+                    for (InterfaceAddress ia : ni.getInterfaceAddresses()) {
+                        if (ia.getBroadcast() != null) {  //If limited to IPV4
+                            return ia.getAddress().getHostAddress();
+                        }
+                    }
+                }
+            }
+        } catch (SocketException e) {
+        }
+        return null;
     }
 }

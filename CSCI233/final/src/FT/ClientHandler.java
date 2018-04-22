@@ -54,7 +54,7 @@ public class ClientHandler implements Runnable {
                     return;
                 }
             }
-//            sendMessage("Done");
+            sendMessage("DONE");
             if (files.size() <= 0 || 5 < files.size()) {
                 closeConnection("Illegal number of files");
                 return;
