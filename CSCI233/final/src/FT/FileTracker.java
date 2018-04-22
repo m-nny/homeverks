@@ -75,24 +75,34 @@ class FileTracker {
 
     static void incNumberOfRequests(String address) {
         synchronized (requestsMap) {
-            requestsMap.put(address, requestsMap.getOrDefault(address, 0) + 1);
+            int oldValue = requestsMap.getOrDefault(address, 0);
+            requestsMap.put(address, oldValue + 1);
+            System.out.println(address + " requests++");
         }
     }
 
     static void incNumberOfUploads(String address) {
         synchronized (uploadsMap) {
-            uploadsMap.put(address, uploadsMap.getOrDefault(address, 0) + 1);
+            int oldValue = uploadsMap.getOrDefault(address, 0);
+            uploadsMap.put(address, oldValue + 1);
+            System.out.println(address + " uploads++");
         }
     }
 
     static String getRate(String address) {
         int request, uploads;
         synchronized (requestsMap) {
-            request = requestsMap.getOrDefault(address, 1);
+            request = requestsMap.getOrDefault(address, 0);
         }
         synchronized (uploadsMap) {
             uploads = uploadsMap.getOrDefault(address, 0);
         }
-        return String.format("%02d%%", round(uploads / request * 100));
+        if (request == 0) {
+            request = 1;
+            uploads = 0;
+        }
+        System.out.println(address + ":" + uploadsMap.get(address) + "/" + requestsMap.get(address));
+        System.out.println(String.format("%02d%%", 100 * uploads / request));
+        return String.format("%02d%%", 100 * uploads / request);
     }
 }

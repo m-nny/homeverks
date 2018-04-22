@@ -139,6 +139,8 @@ public class ClientHandler implements Runnable {
             return "NOT FOUND";
         StringBuilder result = new StringBuilder("FOUND:");
         for (FileModel file : list) {
+            String buf = file.toString() + ("|") + (FileTracker.getRate(file.address));
+            System.out.println("Search result: " + buf);
             result.append(file.toString()).append("|").append(FileTracker.getRate(file.address));
         }
         return result.toString();

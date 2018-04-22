@@ -77,7 +77,7 @@ class Peer {
         Socket sock = new Socket(fm.address, fm.port);
         InputStream in = sock.getInputStream();
         PrintWriter out = new PrintWriter(sock.getOutputStream());
-        FileOutputStream file = new FileOutputStream(folder.getAbsolutePath() + "/" + fm.fileName + "." + fm.fileType);
+        FileOutputStream file = new FileOutputStream(folder.getAbsolutePath() + File.separator + fm.fileName + "." + fm.fileType);
         out.println("DOWNLOAD:" + fm.fileName + "," + fm.fileType + "," + fm.fileSize);
         out.flush();
         byte[] status = new byte[4];
@@ -109,7 +109,8 @@ class Peer {
         String fName = reqFile.split("[:,]")[1];
         String fType = reqFile.split("[:,]")[2];
 //        int fSize = Integer.parseInt(reqFile.split(":|,")[3]);
-        FileInputStream file = new FileInputStream(folder.getAbsolutePath() + "/" + fName + "." + fType);
+        System.out.println("Client requests: |" + reqFile + "|");
+        FileInputStream file = new FileInputStream(folder.getAbsolutePath() + File.separator + fName + "." + fType);
         byte[] buf = new byte[4098];
         int fbytes;
         Random i = new Random();

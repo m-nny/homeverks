@@ -52,7 +52,7 @@ public class MainGUI extends JFrame implements ActionListener {
         jl = new JList(listModel);
 
         JScrollPane listScroller = new JScrollPane(jl);
-        listScroller.setBounds(50, 80, 300, 300);
+        listScroller.setBounds(50, 80, 360, 300);
 
         add(listScroller);
 
