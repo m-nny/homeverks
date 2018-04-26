@@ -2,6 +2,7 @@
 // Created by Alibek Manabayev on 4/12/18.
 //
 
+#include <pthread.h>
 #ifndef PROJECT_GAMESERVER_H
 #define PROJECT_GAMESERVER_H
 
@@ -63,7 +64,6 @@ group_t all_groups[33];
 int l_group = 0;
 
 // Mutex for the each group, so object can be safely used
-pthread_cond_t g_cond[33];
 pthread_mutex_t g_mutex[33];
 pthread_t all_threads[33];
 
@@ -76,19 +76,6 @@ int normalize(char *str, int len);
 
 // Thread-safe parsing of the arguments by "|"
 int parse_args(char *str, char **args);
-
-// Sort members by their points
-void sort_members(group_p q_group);
-
-// reads message from client terminated with CRLF
-// returns status of read
-// 0 - ok
-// 1 - error, occured
-int read_msg_cr(client_p cl, char *str);
-
-// reads message from client with given size in the message
-// returns status of read
-int read_msg_size(client_p cl, char *str);
 
 int find_group(char *group_name);
 
@@ -120,3 +107,5 @@ void *hub(void *args);
 
 // quiz-group function
 void *group_thread(void *args);
+
+void *new_client(void *args);

@@ -88,7 +88,6 @@ group_p create_group(int id, int dedicated_size) {
     group->q_num = 0;
     group->started = 0;
     pthread_mutex_init(g_mutex + id, NULL);
-    pthread_cond_init(g_cond + id, NULL);
     return group;
 }
 
@@ -106,7 +105,6 @@ int destroy_group(int id) {
     free(group->name);
     group->name = NULL;
     pthread_mutex_destroy(g_mutex + id);
-    pthread_cond_destroy(g_cond + id);
     return 0;
 }
 
@@ -135,7 +133,6 @@ int add_member(int gid, client_p client) {
     client->gid = gid;
     printf("Client %d joined %d group\n", client->id, gid);
     fflush(stdout);
-    pthread_cond_signal(g_cond + gid);
     return 0;
 }
 
@@ -361,7 +358,7 @@ void handle_join(char **tokens, int cc, client_p client) {
     }
 }
 
-void handle_group(char **tokens, int cc, client_p client) {
+void handle_create_group(char **tokens, int cc, client_p client) {
     if (cc != 4) {
         cc = (int) write(client->sock, "BAD|Wrong format\r\n", 18);
         if (cc <= 0) {
@@ -433,7 +430,7 @@ void handle_free_client(char *msg, int cc, client_p client) {
     }
     if (strcmp(tokens[0], "GROUP") == 0) {
         printf("It was open GROUP:[]\n");
-        handle_group(tokens, cc, client);
+        handle_create_group(tokens, cc, client);
     }
 }
 
@@ -620,6 +617,7 @@ void *group_thread(void *args) {
             continue;
         remove_member(gid, client);
     }
+    destroy_group(gid);
     pthread_exit(NULL);
 }
 
