@@ -15,6 +15,8 @@
 #define MAX_BUFFER_SIZE   2048
 #define SEPARATOR "|"
 #define QLEN 5
+#define TEMPORARY_FOLDER  "__test__"
+
 
 struct question_struct {
     char *str;
@@ -29,7 +31,7 @@ struct client_struct {
     char *name;
     int n_len;
     int point;
-    int g_id;
+    int gid;
 };
 
 struct group_struct {
@@ -40,8 +42,11 @@ struct group_struct {
     int n_len;
     int c_size;
     int d_size;
-    struct client_struct *admin;
+    int q_num;
+    int started;
+    int admin;
     struct client_struct **members; // array for the members of the group
+    struct question_struct **question;
 };
 
 typedef struct question_struct question_t;
@@ -58,9 +63,9 @@ group_t all_groups[33];
 int l_group = 0;
 
 // Mutex for the each group, so object can be safely used
+pthread_cond_t g_cond[33];
 pthread_mutex_t g_mutex[33];
 pthread_t all_threads[33];
-int l_thread = 0;
 
 // there will be at most 1020 clients
 client_t all_clients[1024];
@@ -92,17 +97,19 @@ int open_groups(char **str);
 // adds and removes member to the group. Appropriate mutex should be locked before it
 // returns status of the operation:
 // 0 - ok
-// add: 1 - no such group, 2 - full group, 3 - already there
+// add: 1 - no such group, 2 - full group, 3 - already there, 4 - quiz already started
 // remove: 1 - no such group, 2 - no such client_t
-int add_member(int g_id, client_p client);
+int add_member(int gid, client_p client);
 
-int remove_member(int g_id, client_p client);
+int remove_member(int gid, client_p client);
 
 // Only creates client_t object
 client_p create_client(int sock);
+
 int destroy_client(client_p client);
 
 group_p create_group(int id, int dedicated_size);
+
 int destroy_group(int id);
 
 // Close connection, remove from groups, and all lists
